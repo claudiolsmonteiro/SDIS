@@ -3,6 +3,7 @@ package channels;
 import java.io.IOException;
 import java.net.*;
 import java.nio.charset.StandardCharsets;
+
 import utilities.MessageFormat;
 
 public class MulticastControl extends Thread{
@@ -57,12 +58,17 @@ public class MulticastControl extends Thread{
 		String[] messageValues = new String[5];
 		byte[] bodyData = null;
 		MessageFormat.processMessage(data, messageValues, bodyData);
-		
+		Thread t1;
 		String type = messageValues[0];
 		
 		switch(type){
 			case "STORED":{
-				//FAZER ALGO
+				t1 = new Thread(new Runnable() {
+					public void run() {
+						System.out.println("STORED CHUNK: " + messageValues[3]);
+					}
+				});
+				t1.start();
 				break;
 			}
 			case "GETCHUNK":{

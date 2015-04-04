@@ -29,16 +29,10 @@ public class Backup {
 		Random rand = new Random(); 
 		int waitTime = rand.nextInt(401); // 0 a 400 milisegundos	
 
-		try {
-			Thread.sleep(waitTime);
-		} catch (InterruptedException e) {
-			e.printStackTrace();
-		}
-
 		File backups = new File("backups");
 		if(!backups.exists()){
-			System.out.println("Nao existem backups neste peer!");
-			return 1;
+			System.out.println("There is no backups on this peer!");
+			backups.mkdir();
 		}
 		else{ //Verificar se já tenho o chunk
 			File filename = new File("backups/" + fileID);
@@ -48,14 +42,19 @@ public class Backup {
 				if(chunkNumber < chunks.length){
 					File checkChunkExist = new File("backups/" + fileID + "/" + chunkNo + ".chunk");
 					if(checkChunkExist.exists()){
-						System.out.println("Chunk ja se encontra guardado neste peer.");
+						System.out.println("Chunk already stored on this peer.");
 						return 2;
 					}
+				}
+				else{
+					FileOutputStream saveChunk = new FileOutputStream("backups/" + fileID + "/" + chunkNo + ".chunk");
+					saveChunk.write(chunkBody);
+					saveChunk.close();
 				}
 			}
 			else{ //Guardar o chunk
 				filename.mkdir();
-				FileOutputStream saveChunk = new FileOutputStream("backups/" + fileID + "/" + chunkNo + ".chunk", true);
+				FileOutputStream saveChunk = new FileOutputStream("backups/" + fileID + "/" + chunkNo + ".chunk");
 				saveChunk.write(chunkBody);
 				saveChunk.close();
 			}
@@ -72,6 +71,12 @@ public class Backup {
 		}
 		else{
 			Main.chunkCache.put(fileID + chunkNo, 1);
+		}
+		
+		try {
+			Thread.sleep(waitTime);
+		} catch (InterruptedException e) {
+			e.printStackTrace();
 		}
 
 		adressMC = Main.mc.getAddress();
@@ -129,7 +134,7 @@ public class Backup {
 
 		String[] requests = MessageFormat.createMessageArray("PUTCHUNK", "1.0", fileID, Integer.toString(replicDegree), fileSplitted);
 		System.out.println("## Going to send " + requests.length + " chunks to the network.\n");
-		
+
 		scanner.close();
 
 
@@ -145,12 +150,12 @@ public class Backup {
 						break;
 					}
 				}
-				
+
 				adressMDB = Main.mdb.getAddress();
 				byte[] requestData =  requests[i].getBytes();
 				packet = new DatagramPacket(requestData, requestData.length, adressMDB, Main.mdb.getMDBPort());
 				Main.mdb.getMDBsocket().send(packet);
-				
+
 				Thread.sleep(timeout);
 				timeout *= 2;
 				count++;

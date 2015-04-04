@@ -7,7 +7,7 @@ import java.util.Scanner;
 import channels.*;
 
 public class Main {
-	
+
 	public static MulticastControl mc;
 	public static MulticastRestore mdr;
 	public static MulticastBackup mdb;
@@ -16,7 +16,7 @@ public class Main {
 	protected static int mc_port,mdb_port,mdr_port,op = 0;
 	public static HashMap<String, Integer> chunkCache = new HashMap<String, Integer>();
 
-	
+
 	public static void main(String []args) throws IOException, NoSuchAlgorithmException, InterruptedException {
 
 		// private static Backup backup;
@@ -50,9 +50,21 @@ public class Main {
 			System.out.println("4 - Space reclaiming");
 			System.out.println("5 - Leave");
 			op = sc.nextInt();
-			
+
+			Thread t1;
+
 			if(op == 1){
-				Backup.sendChunk();
+				t1 = new Thread(new Runnable() {
+					public void run() {
+						try {
+							Backup.sendChunk();
+						} catch (NoSuchAlgorithmException | IOException
+								| InterruptedException e) {
+							e.printStackTrace();
+						}
+					}
+				});
+				t1.start();
 			}
 		} while(op < 1 || op > 5);
 	}

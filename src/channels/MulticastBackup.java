@@ -9,6 +9,7 @@ import java.net.MulticastSocket;
 import java.net.SocketAddress;
 import java.nio.charset.StandardCharsets;
 
+import protocols.Backup;
 import utilities.MessageFormat;
 
 public class MulticastBackup extends Thread {
@@ -19,7 +20,7 @@ public class MulticastBackup extends Thread {
 	protected DatagramPacket packet ;
 	protected int MDBport;
 
-	protected byte[] data = new byte[256];
+	protected byte[] data = new byte[65536];
 	protected volatile boolean running = true;
 
 
@@ -49,7 +50,12 @@ public class MulticastBackup extends Thread {
 
 			dataReceived = new String(packet.getData(), StandardCharsets.ISO_8859_1);
 
-			processData(dataReceived);
+			try {
+				processData(dataReceived);
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 
 
 		}
@@ -59,31 +65,27 @@ public class MulticastBackup extends Thread {
 		running = false;
 	}
 
-	public void processData(String data){
+	public void processData(String data) throws IOException{
 		String[] messageValues = new String[5];
-		byte[] bodyData = null;
+		byte[] bodyData = new byte[64000];
 		MessageFormat.processMessage(data, messageValues, bodyData);
-
+		Thread t1;
 		String type = messageValues[0];
-
-		switch(type){
-		case "STORED":{
-			//FAZER ALGO
-			break;
-		}
-		case "GETCHUNK":{
-			//FAZER ALGO
-			break;
-		}
-		case "DELETE":{
-			//FAZER ALGO
-			break;
-		}
-		case "REMOVED":{
-			//FAZER ALGO
-			break;
-		}
-		}		
+		t1 = new Thread(new Runnable() {
+			public void run() {
+				int ret = 1;
+				try {
+					ret = Backup.receiveChunk(messageValues, bodyData);
+				} catch (IOException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+				if(ret == 0){
+					System.out.println("Chunk #" + messageValues[3] + " stored successfully!");
+				}
+			}
+		});
+		t1.start();
 	}
 
 
