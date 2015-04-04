@@ -36,9 +36,9 @@ public class MessageFormat {
 
 	//Create Header Message receiving description of the message (type, version, etc)
 
-	public static String createMessageHeader(String type, String version, String fileID, int chunkNo, String replicDeg){
+	public static String createMessageHeader(String type, String version, String fileID, String chunkNo, String replicDeg){
 		String headerMSG = new String();
-		headerMSG = type + " " + version + " " + fileID + " " + chunkNo + " " + replicDeg + CRLF;
+		headerMSG = type + " " + version + " " + fileID + " " + chunkNo + " " + replicDeg + CRLF + CRLF;
 
 		return headerMSG;
 	}
@@ -65,7 +65,7 @@ public class MessageFormat {
 		return dataSplitted;
 	}
 
-	public static String createMessage(String type, String version, String fileID, int chunkNo, String replicDeg, byte[] fileData){
+	public static String createMessage(String type, String version, String fileID, String chunkNo, String replicDeg, byte[] fileData){
 		String messageDone = createMessageHeader(type, version, fileID, chunkNo, replicDeg) + (new String (fileData, StandardCharsets.ISO_8859_1));
 
 		return messageDone;        
@@ -75,10 +75,51 @@ public class MessageFormat {
 		String[] messagesArray = new String[fileData.length];
 
 		for(int i = 0; i < fileData.length; i++){
-			messagesArray[i] = createMessage(type, version, fileID, i, replicDeg, fileData[i]);
+			messagesArray[i] = createMessage(type, version, fileID, Integer.toString(i), replicDeg, fileData[i]);
 		}
 
 		return messagesArray;
+	}
+	
+	public static int processMessage(String message, String[] values, byte[] fileData){
+		
+		String[] messageData = message.split("\r\n\r\n");
+		
+		String[] messageHeader = messageData[0].split("\\s+");
+		
+		if(messageHeader.length == 2){ //DELETE command
+			values[0] = messageHeader[0];
+			values[1] = messageHeader[1];
+		}
+		else if(messageHeader.length == 4){ //STORED, GETCHUNK, CHUNK & REMOVED commands
+			values[0] = messageHeader[0];
+			values[1] = messageHeader[1];
+			values[2] = messageHeader[2];
+			values[3] = messageHeader[3];
+		}
+		else if(messageHeader.length == 5){
+			values[0] = messageHeader[0];
+			values[1] = messageHeader[1];
+			values[2] = messageHeader[2];
+			values[3] = messageHeader[3];
+			values[4] = messageHeader[4];
+		}
+		else{
+			System.out.println(messageHeader.length);
+			for(int i = 0; i < messageHeader.length; i++){
+				System.out.println(messageHeader[i]);
+			}
+			return 1; //Return 1, failed message header processing
+		}
+		
+		if(messageData.length == 2){ //Message with data
+			fileData = messageData[1].getBytes();
+		}
+		else if(messageData.length > 2)
+			return 2; //Return 2, failed message data processing
+	
+		return 0; //Message processed successfully
+		
 	}
 
 	public static void main(String args[]) throws IOException, NoSuchAlgorithmException {
@@ -107,7 +148,7 @@ public class MessageFormat {
 		byte[][] fileSplitted = getDataArray(file);
 		String[] messages = createMessageArray("PUTCHUNK", "1.0", "filename", "replicDegree", fileSplitted);
 
-		for(int i = 0; i < fileSplitted.length; i++){
+		/*for(int i = 0; i < fileSplitted.length; i++){
 
 			FileOutputStream fileOuputStream = new FileOutputStream("backups" + "/" + filename2 + "/" + i + ".chunk", true);
 			fileOuputStream.write(fileSplitted[i]);
@@ -143,6 +184,20 @@ public class MessageFormat {
 				e.printStackTrace();
 			}
 		}
-		ficheiroRestaurado.close();
-	}
+		ficheiroRestaurado.close();*/
+		
+		String teste = createMessage("DELETE", "version", "filename", "20", "", fileSplitted[0]);
+		
+		String values[] = new String[5];
+		byte[] data = null;
+		
+		int yolo = processMessage(teste, values, data);
+		
+		System.out.println(yolo);
+		System.out.println(values[0]);
+		System.out.println(values[1]);
+		System.out.println(values[2]);
+		System.out.println(values[3]);
+		System.out.println(values[4]);
+		}
 }
