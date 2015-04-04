@@ -10,8 +10,10 @@ public class MulticastControl extends Thread{
 	protected InetAddress address;
 	protected SocketAddress socketAddress;
 	protected MulticastSocket MCsocket;
-	protected DatagramPacket packet;
+	protected DatagramPacket packet ;
+	protected int MCport;
 	
+	protected byte[] data = new byte[256];
 	protected volatile boolean running = true;
 	
 	
@@ -21,6 +23,7 @@ public class MulticastControl extends Thread{
 		MCsocket = new MulticastSocket(null);
 		MCsocket.bind(socketAddress);
 		MCsocket.joinGroup(address);
+		MCport = port;
 		this.start();
 	}
 	
@@ -28,6 +31,7 @@ public class MulticastControl extends Thread{
 		
 		while(running){
 			
+			packet = new DatagramPacket(data, data.length);
 			String dataReceived;
 			
 			//Waiting for packets
@@ -73,8 +77,18 @@ public class MulticastControl extends Thread{
 				//FAZER ALGO
 				break;
 			}
-		}
-		
-		
+		}		
+	}
+	
+	public InetAddress getAddress(){
+		return address;
+	}
+
+	public int getMCPort() {
+		return MCport;
+	}
+
+	public MulticastSocket getMCsocket() {
+		return MCsocket;
 	}
 }

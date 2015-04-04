@@ -148,7 +148,7 @@ public class MessageFormat {
 		byte[][] fileSplitted = getDataArray(file);
 		String[] messages = createMessageArray("PUTCHUNK", "1.0", "filename", "replicDegree", fileSplitted);
 
-		/*for(int i = 0; i < fileSplitted.length; i++){
+		for(int i = 0; i < fileSplitted.length; i++){
 
 			FileOutputStream fileOuputStream = new FileOutputStream("backups" + "/" + filename2 + "/" + i + ".chunk", true);
 			fileOuputStream.write(fileSplitted[i]);
@@ -156,7 +156,7 @@ public class MessageFormat {
 			System.out.println("ACABOU O CHUNK!!!!!!!");
 		}
 		
-		
+		/*
 		//Restauro do ficheiro
 		File folder = new File("backups/" + filename2);
 		File[] listFiles = folder.listFiles();
