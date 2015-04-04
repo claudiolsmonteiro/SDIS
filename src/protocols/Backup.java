@@ -155,6 +155,9 @@ public class Backup {
 				timeout *= 2;
 				count++;
 			}
+			if(count == 5){
+				System.out.println("TIMEOUT CHUNK #" + i);
+			}
 			count = 0;
 		}
 
