@@ -39,8 +39,11 @@ public class Main {
 			mdr_port = Integer.parseInt(args[5]);
 		}
 		mc = new MulticastControl(mc_ip,mc_port);
-		//mdr = new MulticastRestore(mdr_ip,mdr_port);
+		mc.start();
+		mdr = new MulticastRestore(mdr_ip,mdr_port);
+		mdr.start();
 		mdb = new MulticastBackup(mdb_ip,mdb_port);
+		mdb.start();
 
 		do {
 			System.out.println("_________Main Menu_________");
@@ -54,17 +57,7 @@ public class Main {
 			Thread t1;
 
 			if(op == 1){
-				t1 = new Thread(new Runnable() {
-					public void run() {
-						try {
-							Backup.sendChunk();
-						} catch (NoSuchAlgorithmException | IOException
-								| InterruptedException e) {
-							e.printStackTrace();
-						}
-					}
-				});
-				t1.start();
+				Backup.sendChunk();
 			}
 		} while(op < 1 || op > 5);
 	}

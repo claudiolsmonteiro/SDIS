@@ -12,7 +12,7 @@ import protocols.Backup;
 import protocols.Restore;
 import utilities.MessageFormat;
 
-public class MulticastRestore {
+public class MulticastRestore extends Thread{
 	protected InetAddress address;
 	protected SocketAddress socketAddress;
 	protected MulticastSocket MDRsocket;
@@ -28,7 +28,6 @@ public class MulticastRestore {
 		MDRsocket.bind(socketAddress);
 		MDRsocket.joinGroup(address);
 		MDRport = port;
-		this.start();
 	}
 	
 	public void run() {
@@ -67,7 +66,7 @@ public class MulticastRestore {
 			public void run() {
 				int ret = 1;
 				try {
-					ret = Restore.checkChunk(messageValues, bodyData);
+					ret = Restore.checkChunk(messageValues[2], messageValues[3]);
 				} catch (IOException e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
