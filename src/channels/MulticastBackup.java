@@ -30,7 +30,7 @@ public class MulticastBackup extends Thread {
 		MDBsocket.bind(socketAddress);
 		MDBsocket.joinGroup(address);
 		MDBport = port;
-		this.start();
+		//this.start();
 	}
 
 	public void run() {

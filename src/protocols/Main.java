@@ -13,16 +13,17 @@ public class Main {
 	public static MulticastBackup mdb;
 	protected static Scanner sc = new Scanner(System.in);
 	protected static String mc_ip,mdb_ip,mdr_ip;
-	protected static int mc_port,mdb_port,mdr_port,op = 0;
+	protected static int mc_port,mdb_port,mdr_port;
+	
 	public static HashMap<String, Integer> chunkCache = new HashMap<String, Integer>();
-
+	public static boolean wh = true;
 
 	public static void main(String []args) throws IOException, NoSuchAlgorithmException, InterruptedException {
-
+		String op;
 		// private static Backup backup;
 		// private static Restore restore;
 		//  private static Control control;
-		if (args.length == 0 || args.length != 6) {
+		if (args.length != 6) {
 			mc_ip = "230.0.0.1";
 			mc_port = 4446;
 			mdb_ip = "230.0.0.2";
@@ -52,11 +53,16 @@ public class Main {
 			System.out.println("3 - File deletion");
 			System.out.println("4 - Space reclaiming");
 			System.out.println("5 - Leave");
-			op = sc.nextInt();
+			op = sc.nextLine();
 			
-			if(op == 1){
+			if(op.equals("1")){
 				Backup.sendChunk();
 			}
-		} while(op < 1 || op > 5);
+			else if(op.equals("2")){
+				Restore.sendGetChunk();
+			}
+			else if(op.equals("5"))
+				wh = false;
+		} while(sc.hasNextLine());
 	}
 }

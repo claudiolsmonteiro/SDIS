@@ -15,17 +15,17 @@ import utilities.*;
 
 public class Restore {
 	Scanner sc = new Scanner(System.in);
-	String message = "";
+	static String message = "";
 	File directory;
 	boolean exists= false;
-	int nchunks;
+	static int nchunks;
 	protected static DatagramPacket packet;
 	protected static InetAddress adressMC;
 	protected static InetAddress adressMDR;
-	public String filename;
+	public static String filename;
 
 	//Funcao que envia um pedido de restauro do ficheiro, GETCHUNK para o MC (GETCHUNK)
-	public int sendGetChunk() throws IOException, NoSuchAlgorithmException {
+	public static int sendGetChunk() throws IOException, NoSuchAlgorithmException {
 		System.out.print("Insert file's path: ");
 		Scanner scanner = new Scanner(System.in);
 		String filepath = scanner.nextLine();

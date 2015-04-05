@@ -26,7 +26,7 @@ public class MulticastControl extends Thread{
 		MCsocket.bind(socketAddress);
 		MCsocket.joinGroup(address);
 		MCport = port;
-		this.start();
+		//this.start();
 	}
 
 	public void run() {
