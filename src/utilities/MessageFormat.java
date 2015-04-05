@@ -20,13 +20,13 @@ import static java.util.Arrays.copyOfRange;
 
 /**
  *
- * @author Fábio
+ * @author Fï¿½bio
  */
 
 
 public class MessageFormat {
 	private static final String CRLF = "\r\n";
-	private static final int MAXDATASIZE = 64000;
+	public static final int MAXDATASIZE = 64000;
 
 	protected byte[] buf = new byte[65536];
 	protected byte[] headerBuf = new byte[1536];
@@ -168,7 +168,7 @@ public class MessageFormat {
 			file3.mkdir(); //make folder backups to store backups
 		}
 		
-		System.out.println("########## A começar o processo de restauro...");
+		System.out.println("########## A comeï¿½ar o processo de restauro...");
 		
 		FileOutputStream ficheiroRestaurado = new FileOutputStream("restored/teste.JPG", true);
 		for(int i = 0; i < listFiles.length; i++){

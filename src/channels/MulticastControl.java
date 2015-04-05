@@ -73,6 +73,12 @@ public class MulticastControl extends Thread{
 			}
 			case "GETCHUNK":{
 				//FAZER ALGO
+				t1 = new Thread(new Runnable() {
+					public void run() {
+						
+					}
+				});
+				t1.start();
 				break;
 			}
 			case "DELETE":{
