@@ -10,6 +10,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import static java.util.Arrays.copyOfRange;
 
+
 /*
  * To change this license header, choose License Headers in Project Properties.
  * To change this template file, choose Tools | Templates
@@ -48,15 +49,36 @@ public class MessageFormat {
 	}
 
 	public static byte[][] getDataArray(byte[] fileData){
-		int noChunks = fileData.length/MAXDATASIZE;
-		byte[][] dataSplitted = new byte[noChunks + 1][];
+		float noChunks = (float)fileData.length/MAXDATASIZE;
+		int remainder = fileData.length%MAXDATASIZE;
+		System.out.println("##### Numero chunks: " + (int)noChunks);
+		System.out.println("##### Resto da divisao: " + remainder);
+		System.out.println("##### Filesize:" + fileData.length);
+		byte[][] dataSplitted = new byte[(int)noChunks + 1][];
 
-		for(int i = 0; i < noChunks + 1; i++){
-			if(i == noChunks){
-				dataSplitted[i] = copyOfRange(fileData, 0 + i*MAXDATASIZE, fileData.length);
+		if((int)noChunks == 0){
+			dataSplitted[0] = copyOfRange(fileData, 0, fileData.length);
+			//System.out.println("tamanho do data: " + dataSplitted[0].length);
+			return dataSplitted;
+		}
+		else if((int)noChunks > 0 && remainder == 0){
+			for(int i = 0; i < (int)noChunks + 1; i++){
+				if(i == noChunks){
+					dataSplitted[i] = new byte[0];
+				}
+				else{
+					dataSplitted[i] = copyOfRange(fileData, 0 + i*MAXDATASIZE, MAXDATASIZE + i*MAXDATASIZE);
+				}
 			}
-			else{
-				dataSplitted[i] = copyOfRange(fileData, 0 + i*MAXDATASIZE, MAXDATASIZE + i*MAXDATASIZE);
+		}
+		else{
+			for(int i = 0; i < (int)noChunks + 1; i++){
+				if(i == noChunks){
+					dataSplitted[i] = copyOfRange(fileData, 0 + i*MAXDATASIZE, fileData.length);
+				}
+				else{
+					dataSplitted[i] = copyOfRange(fileData, 0 + i*MAXDATASIZE, MAXDATASIZE + i*MAXDATASIZE);
+				}
 			}
 		}
 
@@ -78,13 +100,13 @@ public class MessageFormat {
 
 		return messagesArray;
 	}
-	
-	public static int processMessage(String message, String[] values, byte[] fileData){
-		
+
+	public static int processMessage(String message, String[] values, String fileData){
+
 		String[] messageData = message.split("\r\n\r\n");
 		
 		String[] messageHeader = messageData[0].split("\\s+");
-		
+
 		if(messageHeader.length == 2){ //DELETE command
 			values[0] = messageHeader[0];
 			values[1] = messageHeader[1];
@@ -94,6 +116,14 @@ public class MessageFormat {
 			values[1] = messageHeader[1];
 			values[2] = messageHeader[2];
 			values[3] = messageHeader[3];
+			
+			if(values[0].equals("CHUNK")){
+				if(messageData.length == 1){
+					return 0;
+				}
+				fileData = messageData[1];
+				return messageData[1].length();
+			}
 		}
 		else if(messageHeader.length == 5){
 			values[0] = messageHeader[0];
@@ -101,6 +131,12 @@ public class MessageFormat {
 			values[2] = messageHeader[2];
 			values[3] = messageHeader[3];
 			values[4] = messageHeader[4];
+			
+			if(messageData.length == 1){
+				return 0;
+			}
+			fileData = messageData[1];
+			return messageData[1].length();
 		}
 		else{
 			System.out.println(messageHeader.length);
@@ -110,31 +146,28 @@ public class MessageFormat {
 			return 1; //Return 1, failed message header processing
 		}
 		
-		if(messageData.length == 2){ //Message with data
-			fileData = messageData[1].getBytes();
-		}
-		else if(messageData.length > 2)
+		if(messageData.length > 2)
 			return 2; //Return 2, failed message data processing
-	
+
 		return 0; //Message processed successfully
-		
+
 	}
-	
+
 	public static void mergeChunks(String filename, String fileID) throws IOException{
-		
+
 		File file3 = new File("restored");
 
 		if (!file3.exists()) {
 			file3.mkdir(); //make folder backups to store backups
 		}
-		
+
 		System.out.println("########## A comecar o processo de restauro do ficheiro...");
-		
+
 		FileOutputStream ficheiroRestaurado = new FileOutputStream("restored/" + filename, true);
 		File fileName = new File("restored/" + fileID);
 		File[] listFiles = fileName.listFiles();
 		Utilities.sortFilesByIdName(true, listFiles);
-		
+
 		for(int i = 0; i < listFiles.length; i++){
 			System.out.println("Juntou o chunk: #" + i);
 			RandomAccessFile f = new RandomAccessFile(listFiles[i], "r");

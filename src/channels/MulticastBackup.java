@@ -22,7 +22,6 @@ public class MulticastBackup extends Thread {
 	protected byte[] data = new byte[65536];
 	protected volatile boolean running = true;
 
-
 	public MulticastBackup(String IPaddress, int port) throws IOException{
 		address = InetAddress.getByName(IPaddress);
 		socketAddress = new InetSocketAddress(port);
@@ -30,13 +29,11 @@ public class MulticastBackup extends Thread {
 		MDBsocket.bind(socketAddress);
 		MDBsocket.joinGroup(address);
 		MDBport = port;
-		//this.start();
 	}
 
 	public void run() {
 
 		while(running){
-
 			packet = new DatagramPacket(data, data.length);
 			String dataReceived;
 
@@ -47,7 +44,7 @@ public class MulticastBackup extends Thread {
 				e.printStackTrace();
 			}
 
-			dataReceived = new String(packet.getData(), StandardCharsets.ISO_8859_1);
+			dataReceived = new String(packet.getData(), 0, packet.getLength(), StandardCharsets.ISO_8859_1);
 
 			try {
 				processData(dataReceived);
@@ -55,8 +52,6 @@ public class MulticastBackup extends Thread {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
-
-
 		}
 	}
 
@@ -66,8 +61,10 @@ public class MulticastBackup extends Thread {
 
 	public void processData(String data) throws IOException{
 		String[] messageValues = new String[5];
-		byte[] bodyData = new byte[64000];
-		MessageFormat.processMessage(data, messageValues, bodyData);
+		String fileData = null;
+		int size = MessageFormat.processMessage(data, messageValues, fileData);
+		byte[] bodyData = new byte[size];
+
 		Thread t1;
 		t1 = new Thread(new Runnable() {
 			public void run() {

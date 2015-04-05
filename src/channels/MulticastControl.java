@@ -18,7 +18,6 @@ public class MulticastControl extends Thread{
 	protected byte[] data = new byte[256];
 	protected volatile boolean running = true;
 
-
 	public MulticastControl(String IPaddress, int port) throws IOException{
 		address = InetAddress.getByName(IPaddress);
 		socketAddress = new InetSocketAddress(port);
@@ -26,7 +25,6 @@ public class MulticastControl extends Thread{
 		MCsocket.bind(socketAddress);
 		MCsocket.joinGroup(address);
 		MCport = port;
-		//this.start();
 	}
 
 	public void run() {
@@ -43,11 +41,9 @@ public class MulticastControl extends Thread{
 				e.printStackTrace();
 			}
 
-			dataReceived = new String(packet.getData(), StandardCharsets.ISO_8859_1);
+			dataReceived = new String(packet.getData(), 0, packet.getLength(), StandardCharsets.ISO_8859_1);
 
 			processData(dataReceived);
-
-
 		}
 	}
 
@@ -57,8 +53,8 @@ public class MulticastControl extends Thread{
 
 	public void processData(String data){
 		String[] messageValues = new String[5];
-		byte[] bodyData = null;
-		MessageFormat.processMessage(data, messageValues, bodyData);
+		String fileData = null;
+		MessageFormat.processMessage(data, messageValues, fileData);
 		Thread t1;
 		String type = messageValues[0];
 

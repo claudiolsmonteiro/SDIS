@@ -43,21 +43,19 @@ public class MulticastRestore extends Thread{
 				e.printStackTrace();
 			}
 
-			dataReceived = new String(packet.getData(), StandardCharsets.ISO_8859_1);
+			dataReceived = new String(packet.getData(), 0, packet.getLength(), StandardCharsets.ISO_8859_1);
 
 			try {
 				processData(dataReceived);
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
-
-
 		}
 	}
 	public void processData(String data) throws IOException{
 		String[] messageValues = new String[5];
-		byte[] bodyData = new byte[64000];
-		MessageFormat.processMessage(data, messageValues, bodyData);
+		String fileData = null;
+		MessageFormat.processMessage(data, messageValues, fileData);
 		Thread t1;
 		t1 = new Thread(new Runnable() {
 			public void run() {

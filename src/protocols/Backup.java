@@ -34,6 +34,9 @@ public class Backup {
 			System.out.println("There is no backups on this peer!");
 			backups.mkdir();
 		}
+		else if(chunkBody.length == 0){
+			System.out.println("Last message of file, multiple of 64KB.");
+		}
 		else{ //Verificar se já tenho o chunk
 			File filename = new File("backups/" + fileID);
 			if(filename.exists()){
@@ -47,16 +50,28 @@ public class Backup {
 					}
 				}
 				else{
-					FileOutputStream saveChunk = new FileOutputStream("backups/" + fileID + "/" + chunkNo + ".chunk");
-					saveChunk.write(chunkBody);
-					saveChunk.close();
+					if(chunkBody.length == 0){
+						File lastChunk = new File("backups/" + fileID + "/" + chunkNo + ".chunk");
+						lastChunk.createNewFile();					
+					}
+					else{
+						FileOutputStream saveChunk = new FileOutputStream("backups/" + fileID + "/" + chunkNo + ".chunk");
+						saveChunk.write(chunkBody);
+						saveChunk.close();
+					}
 				}
 			}
 			else{ //Guardar o chunk
 				filename.mkdir();
-				FileOutputStream saveChunk = new FileOutputStream("backups/" + fileID + "/" + chunkNo + ".chunk");
-				saveChunk.write(chunkBody);
-				saveChunk.close();
+				if(chunkBody.length == 0){
+					File lastChunk = new File("backups/" + fileID + "/" + chunkNo + ".chunk");
+					lastChunk.createNewFile();					
+				}
+				else{
+					FileOutputStream saveChunk = new FileOutputStream("backups/" + fileID + "/" + chunkNo + ".chunk");
+					saveChunk.write(chunkBody);
+					saveChunk.close();
+				}
 			}
 		}
 
@@ -72,7 +87,7 @@ public class Backup {
 		else{
 			Main.chunkCache.put(fileID + chunkNo, 1);
 		}
-		
+
 		try {
 			Thread.sleep(waitTime);
 		} catch (InterruptedException e) {
@@ -165,8 +180,6 @@ public class Backup {
 			}
 			count = 0;
 		}
-
-
 		return 0;
 	}
 
