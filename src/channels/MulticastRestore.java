@@ -8,7 +8,6 @@ import java.net.MulticastSocket;
 import java.net.SocketAddress;
 import java.nio.charset.StandardCharsets;
 
-import protocols.Backup;
 import protocols.Restore;
 import utilities.MessageFormat;
 
@@ -49,7 +48,6 @@ public class MulticastRestore extends Thread{
 			try {
 				processData(dataReceived);
 			} catch (IOException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 
@@ -61,7 +59,6 @@ public class MulticastRestore extends Thread{
 		byte[] bodyData = new byte[64000];
 		MessageFormat.processMessage(data, messageValues, bodyData);
 		Thread t1;
-		String type = messageValues[0];
 		t1 = new Thread(new Runnable() {
 			public void run() {
 				int ret = 1;
@@ -80,12 +77,14 @@ public class MulticastRestore extends Thread{
 	}
 
 	public InetAddress getAddress() {
-		// TODO Auto-generated method stub
 		return address;
 	}
 
 	public int getMDRPort() {
-		// TODO Auto-generated method stub
 		return MDRport;
+	}
+
+	public MulticastSocket getMDRsocket() {
+		return MDRsocket;
 	}
 }

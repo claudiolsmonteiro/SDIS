@@ -8,8 +8,6 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.FileSystems;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.security.NoSuchAlgorithmException;
-import java.util.Scanner;
 import static java.util.Arrays.copyOfRange;
 
 /*
@@ -121,46 +119,8 @@ public class MessageFormat {
 		return 0; //Message processed successfully
 		
 	}
-
-	public static void main(String args[]) throws IOException, NoSuchAlgorithmException {
-		System.out.println("Insere o directorio do ficheiro:");
-		Scanner scanner = new Scanner(System.in);
-		String filepath = scanner.nextLine();
-		System.out.println("Insere o nome do ficheiro:");
-		String filename = scanner.nextLine();
-
-		File file2 = new File("backups");
-
-		if (!file2.exists()) {
-			file2.mkdir(); //make folder backups to store backups
-		}
-
-		String filename2 = Encrypt.SHA256(filename);
-		File file1 = new File("backups/" + filename2);
-
-		if (!file1.exists()) {
-			file1.mkdir(); //make folder with the file name to store chunks
-		}
-
-
-		byte[] file;
-		file = getFileData(filepath, filename);
-		byte[][] fileSplitted = getDataArray(file);
-		String[] messages = createMessageArray("PUTCHUNK", "1.0", "filename", "replicDegree", fileSplitted);
-
-		for(int i = 0; i < fileSplitted.length; i++){
-
-			FileOutputStream fileOuputStream = new FileOutputStream("backups" + "/" + filename2 + "/" + i + ".chunk", true);
-			fileOuputStream.write(fileSplitted[i]);
-			fileOuputStream.close();
-			System.out.println("ACABOU O CHUNK!!!!!!!");
-		}
-		
-		/*
-		//Restauro do ficheiro
-		File folder = new File("backups/" + filename2);
-		File[] listFiles = folder.listFiles();
-		Utilities.sortFilesByIdName(true, listFiles);
+	
+	public static void mergeChunks(String filename, String fileID) throws IOException{
 		
 		File file3 = new File("restored");
 
@@ -168,9 +128,13 @@ public class MessageFormat {
 			file3.mkdir(); //make folder backups to store backups
 		}
 		
-		System.out.println("########## A come�ar o processo de restauro...");
+		System.out.println("########## A comecar o processo de restauro do ficheiro...");
 		
-		FileOutputStream ficheiroRestaurado = new FileOutputStream("restored/teste.JPG", true);
+		FileOutputStream ficheiroRestaurado = new FileOutputStream("restored/" + filename, true);
+		File fileName = new File("restored/" + fileID);
+		File[] listFiles = fileName.listFiles();
+		Utilities.sortFilesByIdName(true, listFiles);
+		
 		for(int i = 0; i < listFiles.length; i++){
 			System.out.println("Juntou o chunk: #" + i);
 			RandomAccessFile f = new RandomAccessFile(listFiles[i], "r");
@@ -180,24 +144,10 @@ public class MessageFormat {
 			try {
 				Thread.sleep(100);
 			} catch (InterruptedException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
+			f.close();
 		}
-		ficheiroRestaurado.close();*/
-		
-		String teste = createMessage("DELETE", "version", "filename", "20", "", fileSplitted[0]);
-		
-		String values[] = new String[5];
-		byte[] data = null;
-		
-		int yolo = processMessage(teste, values, data);
-		
-		System.out.println(yolo);
-		System.out.println(values[0]);
-		System.out.println(values[1]);
-		System.out.println(values[2]);
-		System.out.println(values[3]);
-		System.out.println(values[4]);
-		}
+		ficheiroRestaurado.close();		
+	}
 }

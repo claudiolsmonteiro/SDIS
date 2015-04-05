@@ -2,7 +2,6 @@ package channels;
 
 import java.io.IOException;
 import java.net.DatagramPacket;
-import java.net.DatagramSocket;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.net.MulticastSocket;
@@ -70,7 +69,6 @@ public class MulticastBackup extends Thread {
 		byte[] bodyData = new byte[64000];
 		MessageFormat.processMessage(data, messageValues, bodyData);
 		Thread t1;
-		String type = messageValues[0];
 		t1 = new Thread(new Runnable() {
 			public void run() {
 				int ret = 1;

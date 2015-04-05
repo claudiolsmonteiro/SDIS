@@ -53,9 +53,7 @@ public class Main {
 			System.out.println("4 - Space reclaiming");
 			System.out.println("5 - Leave");
 			op = sc.nextInt();
-
-			Thread t1;
-
+			
 			if(op == 1){
 				Backup.sendChunk();
 			}

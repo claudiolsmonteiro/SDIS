@@ -4,13 +4,9 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.lang.reflect.Array;
 import java.net.DatagramPacket;
 import java.net.InetAddress;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.security.NoSuchAlgorithmException;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Random;
 import java.util.Scanner;
@@ -26,6 +22,7 @@ public class Restore {
 	protected static DatagramPacket packet;
 	protected static InetAddress adressMC;
 	protected static InetAddress adressMDR;
+	public String filename;
 
 	//Funcao que envia um pedido de restauro do ficheiro, GETCHUNK para o MC (GETCHUNK)
 	public int sendGetChunk() throws IOException, NoSuchAlgorithmException {
@@ -42,7 +39,7 @@ public class Restore {
 		}
 
 		System.out.print("Insert file's name: ");
-		String filename = scanner.nextLine();
+		filename = scanner.nextLine();
 
 		File fileName = new File(filepath + "/" + filename);
 
@@ -51,7 +48,7 @@ public class Restore {
 			filename = scanner.nextLine();
 			fileName = new File(filepath + "/" + filename);
 		}
-
+		scanner.close();
 
 		System.out.println("## Filepath: " + fileName.getAbsolutePath());
 		System.out.println("## Filename: " + fileName.getName());
@@ -61,7 +58,7 @@ public class Restore {
 
 		byte[][] fileSplitted = MessageFormat.getDataArray(fileData);
 		String fileID = Encrypt.SHA256(filename);
-		nchunks = fileData.length/MessageFormat.MAXDATASIZE;
+		nchunks = fileSplitted.length;
 
 		for(int i = 0;i < nchunks;i++) {
 			message = MessageFormat.createMessageHeader("GETCHUNK", "1.0", fileID, Integer.toString(i), "");
@@ -95,7 +92,6 @@ public class Restore {
 			File filename = new File("backups/" + fileID);
 			if(filename.exists()){
 				File[] chunks = filename.listFiles();
-				int chunkNumber = Integer.parseInt(chunkNo);
 				File tmp = new File(chunkNo + ".chunk");
 
 				if(!Arrays.asList(chunks).contains(tmp)){
@@ -126,7 +122,41 @@ public class Restore {
 		adressMDR = Main.mdr.getAddress();
 		responseData = responseMessage.getBytes();
 		newPacket = new DatagramPacket(responseData, responseData.length, adressMDR, Main.mdr.getMDRPort());
+		Main.mdr.getMDRsocket().send(newPacket);
 
 		return 0;
+	}
+	
+	public static int saveChunk(String[] messageHeader, byte[] bodyData) throws IOException{
+		
+		File restored = new File("restored");
+		if(!restored.exists()){
+			restored.mkdir();
+		}
+		else{
+			File filename = new File("restored/" + messageHeader[2]);
+			if(filename.exists()){
+				File[] chunks = filename.listFiles();
+				File tmp = new File(messageHeader[3] + ".chunk");
+
+				if(Arrays.asList(chunks).contains(tmp)){
+					System.out.println("Chunk has already been restored on this peer.");
+					return 1;
+				}
+				else{
+					FileOutputStream saveChunk = new FileOutputStream("restored/" + messageHeader[2] + "/" + messageHeader[3] + ".chunk");
+					saveChunk.write(bodyData);
+					saveChunk.close();
+				}
+			}
+			else{ 
+				filename.mkdir();
+				FileOutputStream saveChunk = new FileOutputStream("restored/" + messageHeader[2] + "/" + messageHeader[3] + ".chunk");
+				saveChunk.write(bodyData);
+				saveChunk.close();
+			}
+		}
+		
+		return 0;		
 	}
 }
