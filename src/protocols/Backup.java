@@ -22,7 +22,9 @@ public class Backup {
 	//Recebe um PUTCHUNK version filename chunkNo replicDeg <CRLF> <CRLF> Body
 
 	public static int receiveChunk(String[] chunkHeader, byte[] chunkBody) throws IOException{
-
+		
+		adressMC = Main.mc.getAddress();
+		
 		String version = chunkHeader[1];
 		String fileID = chunkHeader[2];
 		String chunkNo = chunkHeader[3];
@@ -94,7 +96,6 @@ public class Backup {
 			e.printStackTrace();
 		}
 
-		adressMC = Main.mc.getAddress();
 		byte[] responseData =  response.getBytes();
 		packet = new DatagramPacket(responseData, responseData.length, adressMC, Main.mc.getMCPort());
 		Main.mc.getMCsocket().send(packet);
@@ -138,7 +139,7 @@ public class Backup {
 			replicDegree = scanner.nextInt();
 		}
 
-		System.out.println("## Filepath: " + fileName.getAbsolutePath());
+		System.out.println("## Filepath: " + fileDir.getAbsolutePath());
 		System.out.println("## Filename: " + fileName.getName());
 		byte[] fileData = MessageFormat.getFileData(filepath, filename);
 
@@ -150,7 +151,7 @@ public class Backup {
 		String[] requests = MessageFormat.createMessageArray("PUTCHUNK", "1.0", fileID, Integer.toString(replicDegree), fileSplitted);
 		System.out.println("## Going to send " + requests.length + " chunks to the network.\n");
 
-		scanner.close();
+		//scanner.close();
 
 
 		//Envio de requests

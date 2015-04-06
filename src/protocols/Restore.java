@@ -27,28 +27,28 @@ public class Restore {
 	//Funcao que envia um pedido de restauro do ficheiro, GETCHUNK para o MC (GETCHUNK)
 	public static int sendGetChunk() throws IOException, NoSuchAlgorithmException {
 		System.out.print("Insert file's path: ");
-		Scanner scanner = new Scanner(System.in);
-		String filepath = scanner.nextLine();
+		Scanner scan = new Scanner(System.in);
+		String filepath = scan.nextLine();
 
 		File fileDir = new File(filepath);
 
 		while(!fileDir.exists()){
 			System.out.print("The path specified doesn't exist...\nInsert file's path: ");
-			filepath = scanner.nextLine();
+			filepath = scan.nextLine();
 			fileDir = new File(filepath);
 		}
 
 		System.out.print("Insert file's name: ");
-		filename = scanner.nextLine();
+		filename = scan.nextLine();
 
 		File fileName = new File(filepath + "/" + filename);
 
 		while(!fileName.exists()){
 			System.out.println("The name specified doesn't exist...\nInsert file's name: ");
-			filename = scanner.nextLine();
+			filename = scan.nextLine();
 			fileName = new File(filepath + "/" + filename);
 		}
-		scanner.close();
+		//scan.close();
 
 		System.out.println("## Filepath: " + fileName.getAbsolutePath());
 		System.out.println("## Filename: " + fileName.getName());

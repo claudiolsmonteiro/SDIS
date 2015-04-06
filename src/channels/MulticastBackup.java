@@ -6,6 +6,7 @@ import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.net.MulticastSocket;
 import java.net.SocketAddress;
+import java.net.UnknownHostException;
 import java.nio.charset.StandardCharsets;
 
 import protocols.Backup;
@@ -34,6 +35,7 @@ public class MulticastBackup extends Thread {
 	public void run() {
 
 		while(running){
+
 			packet = new DatagramPacket(data, data.length);
 			String dataReceived;
 
@@ -44,11 +46,21 @@ public class MulticastBackup extends Thread {
 				e.printStackTrace();
 			}
 
-			dataReceived = new String(packet.getData(), 0, packet.getLength(), StandardCharsets.ISO_8859_1);
-
 			try {
-				processData(dataReceived);
-			} catch (IOException e) {
+				if(packet.getAddress().getHostAddress().equals(InetAddress.getLocalHost().getHostAddress())){
+					return;
+				}
+				else{
+					dataReceived = new String(packet.getData(), 0, packet.getLength(), StandardCharsets.ISO_8859_1);
+
+					try {
+						processData(dataReceived);
+					} catch (IOException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+				}
+			} catch (UnknownHostException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
@@ -68,7 +80,7 @@ public class MulticastBackup extends Thread {
 		Thread t1;
 		t1 = new Thread(new Runnable() {
 			public void run() {
-				int ret = 1;
+				int ret = 2;
 				try {
 					ret = Backup.receiveChunk(messageValues, bodyData);
 				} catch (IOException e) {

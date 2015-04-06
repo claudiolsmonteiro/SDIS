@@ -1,5 +1,6 @@
 package protocols;
 import java.io.IOException;
+import java.net.InetAddress;
 import java.security.NoSuchAlgorithmException;
 import java.util.HashMap;
 import java.util.Scanner;
@@ -11,7 +12,6 @@ public class Main {
 	public static MulticastControl mc;
 	public static MulticastRestore mdr;
 	public static MulticastBackup mdb;
-	protected static Scanner sc = new Scanner(System.in);
 	protected static String mc_ip,mdb_ip,mdr_ip;
 	protected static int mc_port,mdb_port,mdr_port;
 	
@@ -19,7 +19,9 @@ public class Main {
 	public static boolean wh = true;
 
 	public static void main(String []args) throws IOException, NoSuchAlgorithmException, InterruptedException {
+		Scanner sc = new Scanner(System.in);
 		String op;
+		int ret = 0;
 		// private static Backup backup;
 		// private static Restore restore;
 		//  private static Control control;
@@ -56,13 +58,14 @@ public class Main {
 			op = sc.nextLine();
 			
 			if(op.equals("1")){
-				Backup.sendChunk();
+				ret = Backup.sendChunk();
 			}
 			else if(op.equals("2")){
 				Restore.sendGetChunk();
 			}
 			else if(op.equals("5"))
 				wh = false;
-		} while(sc.hasNextLine());
+			
+		} while(ret < 5 && wh);
 	}
 }
