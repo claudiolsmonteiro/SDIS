@@ -48,7 +48,7 @@ public class MulticastBackup extends Thread {
 
 			try {
 				if(packet.getAddress().getHostAddress().equals(InetAddress.getLocalHost().getHostAddress())){
-					return;
+					continue;
 				}
 				else{
 					dataReceived = new String(packet.getData(), 0, packet.getLength(), StandardCharsets.ISO_8859_1);
