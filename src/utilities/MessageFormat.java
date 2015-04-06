@@ -58,12 +58,11 @@ public class MessageFormat {
 
 		if((int)noChunks == 0){
 			dataSplitted[0] = copyOfRange(fileData, 0, fileData.length);
-			//System.out.println("tamanho do data: " + dataSplitted[0].length);
 			return dataSplitted;
 		}
 		else if((int)noChunks > 0 && remainder == 0){
 			for(int i = 0; i < (int)noChunks + 1; i++){
-				if(i == noChunks){
+				if(i == (int)noChunks){
 					dataSplitted[i] = new byte[0];
 				}
 				else{
@@ -73,7 +72,7 @@ public class MessageFormat {
 		}
 		else{
 			for(int i = 0; i < (int)noChunks + 1; i++){
-				if(i == noChunks){
+				if(i == (int)noChunks){
 					dataSplitted[i] = copyOfRange(fileData, 0 + i*MAXDATASIZE, fileData.length);
 				}
 				else{
