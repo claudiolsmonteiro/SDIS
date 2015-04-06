@@ -6,6 +6,7 @@ import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.InetAddress;
 import java.security.NoSuchAlgorithmException;
+import java.util.Arrays;
 import java.util.Random;
 import java.util.Scanner;
 
@@ -22,9 +23,7 @@ public class Backup {
 	//Recebe um PUTCHUNK version filename chunkNo replicDeg <CRLF> <CRLF> Body
 
 	public static int receiveChunk(String[] chunkHeader, byte[] chunkBody) throws IOException{
-		
-		adressMC = Main.mc.getAddress();
-		
+
 		String version = chunkHeader[1];
 		String fileID = chunkHeader[2];
 		String chunkNo = chunkHeader[3];
@@ -33,47 +32,37 @@ public class Backup {
 
 		File backups = new File("backups");
 		if(!backups.exists()){
-			System.out.println("There is no backups on this peer!");
+			System.out.println("There is no backups on this peer!\nCreating backups folder...");
 			backups.mkdir();
 		}
-		else if(chunkBody.length == 0){
+		if(chunkBody.length == 0){
 			System.out.println("Last message of file, multiple of 64KB.");
+			File lastChunk = new File("backups/" + fileID + "/" + chunkNo + ".chunk");
+			lastChunk.createNewFile();
 		}
 		else{ //Verificar se já tenho o chunk
 			File filename = new File("backups/" + fileID);
 			if(filename.exists()){
 				File[] chunks = filename.listFiles();
-				int chunkNumber = Integer.parseInt(chunkNo);
-				if(chunkNumber < chunks.length){
-					File checkChunkExist = new File("backups/" + fileID + "/" + chunkNo + ".chunk");
-					if(checkChunkExist.exists()){
-						System.out.println("Chunk already stored on this peer.");
-						return 2;
-					}
+				File tmp = new File(chunkNo + ".chunk");
+
+				if(Arrays.asList(chunks).contains(tmp)){
+					System.out.println("Chunk already stored on this peer.");
+					return 2;
 				}
 				else{
-					if(chunkBody.length == 0){
-						File lastChunk = new File("backups/" + fileID + "/" + chunkNo + ".chunk");
-						lastChunk.createNewFile();					
-					}
-					else{
-						FileOutputStream saveChunk = new FileOutputStream("backups/" + fileID + "/" + chunkNo + ".chunk");
-						saveChunk.write(chunkBody);
-						saveChunk.close();
-					}
-				}
-			}
-			else{ //Guardar o chunk
-				filename.mkdir();
-				if(chunkBody.length == 0){
-					File lastChunk = new File("backups/" + fileID + "/" + chunkNo + ".chunk");
-					lastChunk.createNewFile();					
-				}
-				else{
+					System.out.println("NUMERO DO CHUNK : " + chunkNo);
 					FileOutputStream saveChunk = new FileOutputStream("backups/" + fileID + "/" + chunkNo + ".chunk");
 					saveChunk.write(chunkBody);
 					saveChunk.close();
 				}
+			}
+			else{ //Guardar o chunk
+				filename.mkdir();
+				System.out.println("NUMERO DO CHUNK : " + chunkNo);
+				FileOutputStream saveChunk = new FileOutputStream("backups/" + fileID + "/" + chunkNo + ".chunk");
+				saveChunk.write(chunkBody);
+				saveChunk.close();
 			}
 		}
 
@@ -96,6 +85,7 @@ public class Backup {
 			e.printStackTrace();
 		}
 
+		adressMC = Main.mc.getAddress();
 		byte[] responseData =  response.getBytes();
 		packet = new DatagramPacket(responseData, responseData.length, adressMC, Main.mc.getMCPort());
 		Main.mc.getMCsocket().send(packet);
