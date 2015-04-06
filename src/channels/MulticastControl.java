@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.net.*;
 import java.nio.charset.StandardCharsets;
 
+import protocols.Main;
 import protocols.Restore;
 import utilities.MessageFormat;
 
@@ -41,9 +42,19 @@ public class MulticastControl extends Thread{
 				e.printStackTrace();
 			}
 
-			dataReceived = new String(packet.getData(), 0, packet.getLength(), StandardCharsets.ISO_8859_1);
+			try {
+				if(packet.getAddress().getHostAddress().equals(InetAddress.getLocalHost().getHostAddress())){
+					return;
+				}
+				else{
+					dataReceived = new String(packet.getData(), 0, packet.getLength(), StandardCharsets.ISO_8859_1);
 
-			processData(dataReceived);
+					processData(dataReceived);
+				}
+			} catch (UnknownHostException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 		}
 	}
 
@@ -63,6 +74,14 @@ public class MulticastControl extends Thread{
 			t1 = new Thread(new Runnable() {
 				public void run() {
 					System.out.println("STORED CHUNK: " + messageValues[3]);
+					if(Main.chunkCache.containsKey(messageValues[2] + messageValues[3])){
+						int increment = Main.chunkCache.get(messageValues[2] + messageValues[3]);
+						increment++;
+						Main.chunkCache.put(messageValues[2] + messageValues[3], increment);
+					}
+					else{
+						Main.chunkCache.put(messageValues[2] + messageValues[3], 1);
+					}
 				}
 			});
 			t1.start();
