@@ -124,5 +124,10 @@ public class UserDB implements Serializable {
 		}
 		return false;
 	}
-
+	public void listBD() {
+		for(int i = 0; i < users.size();i++)
+			System.out.println(users.get(i).getUsername());
+		for(int j = 0; j < groups.size();j++)
+			System.out.println(groups.get(j).getName());
+	}
 }

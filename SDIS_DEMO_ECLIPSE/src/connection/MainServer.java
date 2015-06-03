@@ -14,6 +14,9 @@ import com.restfb.types.User;
 import java.net.*;
 import java.io.*;
 
+import org.json.JSONArray;
+import org.json.JSONObject;
+
 public class MainServer extends Thread{
 	static ServerSocket serverSocket;
 
@@ -56,6 +59,7 @@ public class MainServer extends Thread{
 
 		while(true) {
 			try {
+				userbase.listBD();
 				System.out.println("Waiting for client on port " + serverSocket.getLocalPort() + "...");
 				Socket server = serverSocket.accept();
 				System.out.println("Just connected to " + server.getRemoteSocketAddress());
@@ -64,8 +68,18 @@ public class MainServer extends Thread{
 				
 				String message = getMessage(userbase,in.readUTF());
 				DataOutputStream out = new DataOutputStream(server.getOutputStream());
-				out.writeUTF("Thank you for connecting to " + server.getLocalSocketAddress() + message + "\nGoodbye!");
+				out.writeUTF(message);
+				FileOutputStream f_out = new FileOutputStream("database.ser");
+
+				// Write object with ObjectOutputStream
+				ObjectOutputStream obj_out = new ObjectOutputStream (f_out);
+
+				// Write object out to disk
+				obj_out.writeObject (userbase);
+				obj_out.close();
+				
 				server.close();
+
 			}catch(SocketTimeoutException s) {
 				System.out.println("Socket timed out!");
 				break;
@@ -73,26 +87,19 @@ public class MainServer extends Thread{
 				e.printStackTrace();
 				break;
 			}
-			FileOutputStream f_out = new FileOutputStream("database.ser");
-
-			// Write object with ObjectOutputStream
-			ObjectOutputStream obj_out = new ObjectOutputStream (f_out);
-
-			// Write object out to disk
-			obj_out.writeObject (userbase);
-			obj_out.close();
 		}
 	}
 	
-	//register
-	//login
-	//create group
-	//join group
-	//add permissions
-	//delete permissions
+	//register XX
+	//login XX
+	//create group XX
+	//join group XX
+	//add permissions XX
+	//delete permissions -- da maneira que esta feito depois um novo admin podia apagar o criador
 	//delete file
 	//backup file
 	//restore file
+	@SuppressWarnings("unchecked")
 	public static String getMessage(UserDB userbase, String message ) throws NoSuchAlgorithmException {
 		String response= "";
 		System.out.println(message);
@@ -107,10 +114,14 @@ public class MainServer extends Thread{
 				String[] password = arguments[1].split("\\=");
 				//System.out.println("variable2: " + variable2[1]);
 				if(userbase.passwordcheck(variable1[1].trim(),password[1].trim()) == true){
-					response = "LOGIN COM SUCESSUH";
+			        JSONObject obj = new JSONObject();
+			        obj.put("Login", "Success");
+			        response = obj.toString();
 				}
 				else {
-					response = "LOGIN FALHOU";
+			        JSONObject obj = new JSONObject();
+			        obj.put("Login", "Failed");
+			        response = obj.toString();
 				}
 			}
 			break;
@@ -121,10 +132,14 @@ public class MainServer extends Thread{
 				//System.out.println("variable2: " + variable2[1]);
 				UserT teste = new UserT(variable1[1].trim(), password[1].trim());
 				if(userbase.usercheck(variable1[1].trim()) == true){
-					response = "ESSE USER JA EXISTE FILHO";
+			        JSONObject obj = new JSONObject();
+			        obj.put("Register", "Failed");
+			        response = obj.toString();
 				}
 				else {
-					response = "USER AINDA NAO EXISTE BOY. VOU ADICIONAR XOXO";
+			        JSONObject obj = new JSONObject();
+			        obj.put("Register", "Success");
+			        response = obj.toString();
 					userbase.addUser(teste);
 				}
 
@@ -133,12 +148,21 @@ public class MainServer extends Thread{
 				String[] groupname = arguments[1].split("\\=");
 				int id = UserDB.generateGroupID();
 				if(userbase.checkgroupname(groupname[1].trim()) == true) {
-					response= "ESSE GRUPO JA EXISTE";
+			        JSONObject obj = new JSONObject();
+			        obj.put("CreateGroup", "Failed: Already exists");
+			        response = obj.toString();
 				}
 				else {
 					Group newgroup = new Group (groupname[1].trim(),id,variable1[1].trim());
-					response = "VOU CRIAR NOVO GRUPO";
+			        JSONObject obj = new JSONObject();
+			        obj.put("CreateGroup", "Success");
+			 
 					userbase.addGroup(newgroup);
+					JSONArray group = new JSONArray();
+			        group.put("Accesstoken: "+ newgroup.getAccesstoken());
+			        group.put("Admintoken: "+ newgroup.getAdmintoken());
+			        obj.put("Group details", group);
+			        response = obj.toString();
 				}
 			}
 			break;
@@ -147,27 +171,37 @@ public class MainServer extends Thread{
 				userbase.printGroup();
 				String[] accesstoken = arguments[1].split("\\=");
 				if(userbase.checkAccesstoken(accesstoken[1].trim()) == false) {
-					response = "TOKEN ERRADO/ GRUPO NAO EXISTE";
+			        JSONObject obj = new JSONObject();
+			        obj.put("JoinGroup", "Failed");
+			        response = obj.toString();
 				}
 				else {
 					userbase.joinUserGroup(variable1[1].trim(),accesstoken[1].trim());
-					response = "ja ca estas mano";
+			        JSONObject obj = new JSONObject();
+			        obj.put("JoinGroup", "Success");
+			        response = obj.toString();
 				}
-				System.out.println("ENTREI AKI 4");
 			}
 			if(components[0].trim().matches("JOINADMIN") == true) {
 				userbase.printGroup();
 				String[] admintoken = arguments[1].split("\\=");
 				if(userbase.checkAdmintoken(admintoken[1].trim()) == false) {
-					response = "ADMIN TOKEN ERRADO/ GRUPO NAO EXISTE";
+			        JSONObject obj = new JSONObject();
+			        obj.put("JoinAdmin", "Failed");
+			        response = obj.toString();
 				}
 				else {
 					userbase.joinUserAdmin(variable1[1].trim(),admintoken[1].trim());
-					response = "boa filho, es admin";
+			        JSONObject obj = new JSONObject();
+			        obj.put("JoinAdmin", "Success");
+			        response = obj.toString();
 				}
 			}
 			break;
+		case "DELETE":
+			break;
 		}
+			
 		//DELETE
 		return response;
 

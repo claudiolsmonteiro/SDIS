@@ -4,6 +4,7 @@ import java.net.InetAddress;
 import java.security.NoSuchAlgorithmException;
 import java.util.HashMap;
 import java.util.Scanner;
+import org.json.*;
 
 import utilities.*;
 import channels.*;
@@ -15,7 +16,7 @@ public class Main {
 	public static MulticastRestore mdr;
 	public static MulticastBackup mdb;
 	//public static UserT usertcp;
-	protected static String mc_ip,mdb_ip,mdr_ip, loggeduser;
+	protected static String mc_ip,mdb_ip,mdr_ip, loggeduser="";
 	protected static int mc_port,mdb_port,mdr_port;
 	
 	public static HashMap<String, Integer> chunkCache = new HashMap<String, Integer>();
@@ -66,16 +67,25 @@ public class Main {
 			op = sc.nextLine();
 			
 			if(op.equals("1")){
-				ret = Backup.sendChunk();
+				if(loggeduser.length()!=0)
+					ret = Backup.sendChunk();
+				else
+					System.out.println("You need to login 1st");
 			}
 			else if(op.equals("2")){
-				Restore.sendGetChunk();
+				if(loggeduser.length()!=0)
+					Restore.sendGetChunk();
+				else
+					System.out.println("You need to login 1st");
 			}
 			else if(op.equals("3")){
-				Delete.sendDeleteChunk();
+				if(loggeduser.length()!=0)	
+					Delete.sendDeleteChunk();
+				else
+					System.out.println("You need to login 1st");
 			}
 			else if(op.equals("4")) {
-				String username ="", password="";
+				String username ="", password="",response;
 
 				System.out.println("Username? ");
 				username = sc.nextLine();
@@ -83,48 +93,95 @@ public class Main {
 				System.out.println("Password? ");
 				password = sc.nextLine();
 
-				if(UserT.register(username, password) == true){
+				response =UserT.register(username, password);
+				JSONObject jsonObj = new JSONObject(response);
+				response = jsonObj.getString("Register");
+				if(response.matches("Success"))
 					System.out.println("Registered successfully!");
-				}
-				else
-					System.out.println("User already registered.");
+				else	
+					System.out.println("Register failed.");
 			}
 			else if(op.equals("5")) {
-				String username, password;
+				String username, password,response;
 
 				System.out.println("Username? ");
 				username = sc.nextLine();
 
 				System.out.println("Password? ");
 				password = sc.nextLine();
-				UserT.login(username,password);
-				loggeduser = username;
+				response = UserT.login(username,password);
+				JSONObject jsonObj = new JSONObject(response);
+				response = jsonObj.getString("Login");
+				if(response.matches("Success")) {
+					System.out.println("Logged in successfully!");
+					loggeduser = username;
+				}
+				else	
+					System.out.println("Login failed.");
+
+
 			}
 			else if(op.equals("6")) {
-				String groupname;
-
-				System.out.println("Group Name? ");
-				groupname = sc.nextLine();
-				UserT.creategroup(loggeduser, groupname);
+				if(loggeduser.length() != 0) {
+					String groupname,response,accesstoken,admintoken;
+					JSONArray group;
+	
+					System.out.println("Group Name? ");
+					groupname = sc.nextLine();
+					response = UserT.creategroup(loggeduser, groupname);
+					JSONObject jsonObj = new JSONObject(response);
+					response = jsonObj.getString("CreateGroup");
+					if(response.matches("Success")) {
+						System.out.println("Logged in successfully!");
+						group = jsonObj.getJSONArray("Group details");
+						accesstoken =group.getString(0);
+						admintoken = group.getString(1);
+						System.out.println("Group details \n" + accesstoken + "\n"+ admintoken );
+					}
+					else	
+						System.out.println("Error creating group.");
+				}
+				else
+					System.out.println("You need to login 1st");
 			}
 			else if(op.equals("7")) {
-				String accesstoken;
-				
-				System.out.println("Acess Token?");
-				accesstoken = sc.nextLine();
-				UserT.joingroup(loggeduser, accesstoken);
+				if(loggeduser.length() != 0) {
+					String accesstoken, response;
+					
+					System.out.println("Acess Token?");
+					accesstoken = sc.nextLine();
+					response = UserT.joingroup(loggeduser, accesstoken);
+					JSONObject jsonObj = new JSONObject(response);
+					response = jsonObj.getString("JoinGroup");
+					if(response.matches("Success")) {
+						System.out.println("Joined Group successfully!");
+					}
+					else	
+						System.out.println("Failed Joining group.");
+
+				}
+				else
+					System.out.println("You need to login 1st");
 			}
 			else if(op.equals("8")) {
-				String admintoken;
-				System.out.println("Admin Token?");
-				admintoken = sc.nextLine();
-				UserT.joinAdmin(loggeduser, admintoken);
-				
+				if(loggeduser.length() != 0) {
+					String admintoken,response;
+					System.out.println("Admin Token?");
+					admintoken = sc.nextLine();
+					response = UserT.joinAdmin(loggeduser, admintoken);
+					JSONObject jsonObj = new JSONObject(response);
+					response = jsonObj.getString("JoinAdmin");
+					if(response.matches("Success")) {
+						System.out.println("Admin powers given");
+					}
+					else	
+						System.out.println("Failed Admin.");
+				}
 			}
 			
 			else if(op.equals("9"))
 				wh = false;
 			
-		} while(ret < 5 && wh);
+		} while(ret < 9 && wh);
 	}
 }

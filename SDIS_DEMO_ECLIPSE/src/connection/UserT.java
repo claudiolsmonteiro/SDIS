@@ -23,43 +23,38 @@ public class UserT implements Serializable  {
 //PUT REGISTER?plate=value&ResponseType=type
 //DELETE REGISTER?plate=value&ResponseType=type
 	
-	public static boolean register(String username, String password) throws NoSuchAlgorithmException  {
+	public static String register(String username, String password) throws NoSuchAlgorithmException  {
 		// TODO Auto-generated method stub
 		String pw = utilities.Encrypt.SHA256(password);
 		String message = "PUT REGISTER?username="+username+"&password="+pw+"&ResponseType=JSON";
 		String response = connect(message);
-		System.out.println(response);
-		return true;
+		return response;
 
 	}
 	
-	public static boolean login(String username, String password) throws NoSuchAlgorithmException {
+	public static String login(String username, String password) throws NoSuchAlgorithmException {
 		String pw = utilities.Encrypt.SHA256(password);
 		String message = "GET LOGIN?username="+username+"&password="+pw+"&ResponseType=JSON";
 		String response = connect(message);
-		System.out.println(response);
-		return true;
+		return response;
 	}
-	public static boolean creategroup(String username, String groupname) {
+	public static String creategroup(String username, String groupname) {
 		String message = "PUT CREATEGROUP?username="+username+"&groupname="+groupname+"&ResponseType=JSON";
 		String response = connect(message);
-		System.out.println(response);
-		return true;
+		return response;
 	}
 	
-	public static boolean joingroup(String username, String accesstoken) {
+	public static String joingroup(String username, String accesstoken) {
 		String message = "POST JOINGROUP?username="+username+"&accesstoken="+accesstoken+"&ResponseType=JSON";	
 		String response = connect(message);
-		System.out.println(response);
-		return true;
+		return response;
 	}
 
-	public static boolean joinAdmin(String loggeduser, String admintoken) {
+	public static String joinAdmin(String loggeduser, String admintoken) {
 		// TODO Auto-generated method stub
 		String message = "POST JOINADMIN?username="+loggeduser+"&accesstoken="+admintoken+"&ResponseType=JSON";	
 		String response = connect(message);
-		System.out.println(response);
-		return true;
+		return response;
 	}
 	public static String connect(String something) {
 		String serverName = "localhost",response="";
