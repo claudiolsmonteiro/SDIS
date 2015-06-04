@@ -63,9 +63,13 @@ public class UserDB implements Serializable {
 		return false;
 	}
 
-	public void addGroup(Group newgroup) {
+	public void addGroup(Group newgroup,String username) {
 		// TODO Auto-generated method stub
 		groups.add(newgroup);
+		for(int i = 0; i < users.size();i++)
+			if(users.get(i).getUsername().matches(username))
+				users.get(i).getGroups().add(newgroup);
+		
 	}
 
 	public boolean checkAccesstoken(String trim) {
@@ -123,6 +127,17 @@ public class UserDB implements Serializable {
 			}
 		}
 		return false;
+	}
+	public ArrayList<Group> getGroups(String username){
+
+		if(!users.isEmpty()) {
+			for(int i = 0; i < users.size();i++) {
+				if(users.get(i).getUsername().matches(username) == true) {
+					return users.get(i).getGroups();
+				}
+			}
+		}
+		return null;
 	}
 	public void listBD() {
 		for(int i = 0; i < users.size();i++)

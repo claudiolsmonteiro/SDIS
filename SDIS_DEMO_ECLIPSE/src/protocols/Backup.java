@@ -6,6 +6,7 @@ import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.InetAddress;
 import java.security.NoSuchAlgorithmException;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Random;
 import java.util.Scanner;
@@ -98,18 +99,25 @@ public class Backup {
 
 
 	//Fun��o que pede para guardar um ficheiro, divide-o e envia um request PUTCHUNK para o MCB (PUTCHUNK) 
-	public static int sendChunk() throws NoSuchAlgorithmException, IOException, InterruptedException{
-		
+	public static int sendChunk(ArrayList<String> group_name) throws NoSuchAlgorithmException, IOException, InterruptedException{
+		/*
 		KeyGenerator keyGen = KeyGenerator.getInstance("AES");
 		keyGen.init(256); // for example
 		SecretKey secretKey = keyGen.generateKey();
 		System.out.println(secretKey);
-		
-		
+		*/
+		String groups;
 		System.out.print("Insert file's path: ");
 		Scanner scanner = new Scanner(System.in);
 		String filepath = scanner.nextLine();
-
+		
+		
+		for(int i = 0; i < group_name.size();i++) {
+			System.out.println("Group: "+group_name.get(i));
+		}
+		System.out.println("Select the name of the group to which you want to send your file");
+		groups = scanner.nextLine();
+		
 		File fileDir = new File(filepath);
 
 		while(!fileDir.exists()){

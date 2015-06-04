@@ -1,6 +1,7 @@
 package connection;
 
 import java.security.NoSuchAlgorithmException;
+import java.util.ArrayList;
 import java.util.List;
 /*
 import com.restfb.Connection;
@@ -91,7 +92,7 @@ public class MainServer extends Thread{
 	}
 	
 	//register XX
-	//login XX
+	//login + group list XX
 	//create group XX
 	//join group XX
 	//add permissions XX
@@ -116,6 +117,14 @@ public class MainServer extends Thread{
 				if(userbase.passwordcheck(variable1[1].trim(),password[1].trim()) == true){
 			        JSONObject obj = new JSONObject();
 			        obj.put("Login", "Success");
+			        ArrayList<Group> groups = userbase.getGroups(variable1[1].trim());
+			        if(groups != null) {
+						JSONArray grouplist = new JSONArray();
+						for(int i = 0; i < groups.size(); i++) {
+							grouplist.put("Nome: " + groups.get(i).getName());
+							}
+				        obj.put("Group List", grouplist);
+			        }
 			        response = obj.toString();
 				}
 				else {
@@ -157,7 +166,7 @@ public class MainServer extends Thread{
 			        JSONObject obj = new JSONObject();
 			        obj.put("CreateGroup", "Success");
 			 
-					userbase.addGroup(newgroup);
+					userbase.addGroup(newgroup,variable1[1].trim());
 					JSONArray group = new JSONArray();
 			        group.put("Accesstoken: "+ newgroup.getAccesstoken());
 			        group.put("Admintoken: "+ newgroup.getAdmintoken());
