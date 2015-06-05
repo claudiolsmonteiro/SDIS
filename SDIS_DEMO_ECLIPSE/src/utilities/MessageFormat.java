@@ -106,7 +106,6 @@ public class MessageFormat {
 		String[] messageData = message.split("\r\n\r\n");
 		
 		String[] messageHeader = messageData[0].split("\\s+");
-
 		if(messageHeader.length == 3){ //DELETE command
 			values[0] = messageHeader[0];
 			values[1] = messageHeader[1];

@@ -119,6 +119,7 @@ public class Main {
 					JSONObject jsonObj = new JSONObject(response);
 					response = jsonObj.getString("CreateGroup");
 					if(response.matches("Success")) {
+						loggeduser_groups.add(groupname);
 						System.out.println("Logged in successfully!");
 						group = jsonObj.getJSONArray("Group details");
 						accesstoken =group.getString(0);

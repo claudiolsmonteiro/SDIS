@@ -206,6 +206,22 @@ public class MainServer extends Thread{
 			        response = obj.toString();
 				}
 			}
+			if(components[0].trim().matches("UPDATEGROUP")==true) {
+				String[] filename = arguments[1].split("\\=");
+
+				if(userbase.checkFileExist(variable1[1].trim(),filename[1].trim()) == false){
+					userbase.updateGroupfilelist(variable1[1].trim(),filename[1].trim());
+			        JSONObject obj = new JSONObject();
+			        obj.put("UPDATEGROUP", "Success");
+			        response = obj.toString();
+				}
+				else {
+			        JSONObject obj = new JSONObject();
+			        obj.put("UPDATEGROUP", "File Already Exists");
+			        response = obj.toString();
+				}
+				System.out.println("RESPONSE : WLELELELE"+ response);
+			}
 			break;
 		case "DELETE":
 			break;

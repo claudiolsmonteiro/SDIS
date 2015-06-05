@@ -56,6 +56,11 @@ public class UserT implements Serializable  {
 		String response = connect(message);
 		return response;
 	}
+	public static String updateGroupFilelist(String file,String group) {
+		String message = "POST UPDATEGROUP?groupname="+group+"&filename="+file+"&ReponseType=JSON";
+		String response = connect(message);
+		return response;
+	}
 	public static String connect(String something) {
 		String serverName = "localhost",response="";
 		int port = 6060;

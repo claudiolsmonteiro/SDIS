@@ -14,6 +14,9 @@ import java.util.Scanner;
 import javax.crypto.KeyGenerator;
 import javax.crypto.SecretKey;
 
+import org.json.JSONObject;
+
+import connection.UserT;
 import utilities.CryptoException;
 import utilities.CryptoUtils;
 import utilities.Encrypt;
@@ -33,7 +36,6 @@ public class Backup {
 		String group = chunkHeader [2];
 		String fileID = chunkHeader[3];
 		String chunkNo = chunkHeader[4];
-		System.out.println(version + " " + group + " "+ fileID + " "+ chunkNo+ " ");
 		Random rand = new Random(); 
 		int waitTime = rand.nextInt(401); // 0 a 400 milisegundos	
 
@@ -59,14 +61,14 @@ public class Backup {
 					return 2;
 				}
 				else{
-					FileOutputStream saveChunk = new FileOutputStream("backups/"+group +"/" + fileID + "/" + chunkNo + ".chunk");
+					FileOutputStream saveChunk = new FileOutputStream("backups/" + group + "/" + fileID + "/" + chunkNo + ".chunk");
 					saveChunk.write(chunkBody);
 					saveChunk.close();
 				}
 			}
 			else{ //Guardar o chunk
 				filename.mkdirs();
-				FileOutputStream saveChunk = new FileOutputStream("backups/"+group +"/" + fileID + "/" + chunkNo + ".chunk");
+				FileOutputStream saveChunk = new FileOutputStream("backups/" + group + "/" + fileID + "/" + chunkNo + ".chunk");
 				saveChunk.write(chunkBody);
 				saveChunk.close();
 			}
@@ -74,15 +76,15 @@ public class Backup {
 
 		//Enviar mensagem para o MC a confirmar
 
-		String response = MessageFormat.createMessageHeader("STORED", version, "",fileID, chunkNo, "");
+		String response = MessageFormat.createMessageHeader("STORED", version, "", fileID, chunkNo, "");
 
-		if(Main.chunkCache.containsKey(fileID + chunkNo)){
-			int storedTimes = Main.chunkCache.get(fileID + chunkNo);
+		if(Main.chunkCache.containsKey(fileID + group + chunkNo)){
+			int storedTimes = Main.chunkCache.get(fileID + group + chunkNo);
 			storedTimes++;
-			Main.chunkCache.put(fileID + chunkNo, storedTimes);
+			Main.chunkCache.put(fileID + group + chunkNo, storedTimes);
 		}
 		else{
-			Main.chunkCache.put(fileID + chunkNo, 1);
+			Main.chunkCache.put(fileID + group + chunkNo, 1);
 		}
 
 		try {
@@ -125,7 +127,7 @@ public class Backup {
 		String filename = scanner.nextLine();
 		
 		File fileName = new File(filepath + "/" + filename);
-		
+		UserT.updateGroupFilelist(groupname,filename);
 		while(!fileName.exists()){
 			System.out.println("The name specified doesn't exist...\nInsert file's name: ");
 			filename = scanner.nextLine();
@@ -185,8 +187,8 @@ public class Backup {
 			int timeout = 500; //500milis
 			while(count < 5){
 				System.out.println("Sending chunk #" + i + "... Try #" + (count+1));
-				if(Main.chunkCache.containsKey(fileID + Integer.toString(i))){
-					if(Main.chunkCache.get(fileID + Integer.toString(i)) >= replicDegree){
+				if(Main.chunkCache.containsKey(fileID + groupname + Integer.toString(i))){
+					if(Main.chunkCache.get(fileID + groupname + Integer.toString(i)) >= replicDegree){
 						System.out.println("Reached replication degree on chunk #" + i);
 						break;
 					}

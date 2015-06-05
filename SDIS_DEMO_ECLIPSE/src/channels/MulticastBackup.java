@@ -86,7 +86,7 @@ public class MulticastBackup extends Thread {
 					e.printStackTrace();
 				}
 				if(ret == 0){
-					System.out.println("Chunk #" + messageValues[3] + " stored successfully!");
+					System.out.println("Chunk #" + messageValues[4] + " stored successfully!");
 				}
 			}
 		});

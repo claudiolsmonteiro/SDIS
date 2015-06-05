@@ -145,4 +145,23 @@ public class UserDB implements Serializable {
 		for(int j = 0; j < groups.size();j++)
 			System.out.println(groups.get(j).getName());
 	}
+
+	public void updateGroupfilelist(String group, String file) {
+		// TODO Auto-generated method stub
+		for(int i = 0; i < groups.size();i++) {
+			if(groups.get(i).getName().matches("group") == true)
+				groups.get(i).fileList.add(file);
+		}
+	}
+
+	public boolean checkFileExist(String group, String file) {
+		// TODO Auto-generated method stub
+		for(int i = 0; i < groups.size();i++) {
+			if(groups.get(i).getName().matches("group") == true)
+				for(int j = 0; j < groups.get(i).getFilelist().size();j++)
+					if(groups.get(i).getFilelist().get(j).matches(file) == true)
+						return true;
+		}
+		return false;
+	}
 }
