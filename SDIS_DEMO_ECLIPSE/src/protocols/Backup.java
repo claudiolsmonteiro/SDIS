@@ -65,7 +65,7 @@ public class Backup {
 				}
 			}
 			else{ //Guardar o chunk
-				filename.mkdir();
+				filename.mkdirs();
 				FileOutputStream saveChunk = new FileOutputStream("backups/"+group +"/" + fileID + "/" + chunkNo + ".chunk");
 				saveChunk.write(chunkBody);
 				saveChunk.close();
