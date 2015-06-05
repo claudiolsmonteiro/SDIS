@@ -43,6 +43,11 @@ public class UserT implements Serializable  {
 		String response = connect(message);
 		return response;
 	}
+	public static String revoke(String groupname, String loggeduser, String username){
+		String message = "DELETE REVOKE?groupname=" + groupname + "&loggeduser=" + loggeduser + "&revokeuser=" + username + "&ResponseType=JSON";
+		String response = connect(message);
+		return response;
+	}
 	
 	public static String joingroup(String username, String accesstoken) {
 		String message = "POST JOINGROUP?username="+username+"&accesstoken="+accesstoken+"&ResponseType=JSON";	
@@ -56,7 +61,7 @@ public class UserT implements Serializable  {
 		String response = connect(message);
 		return response;
 	}
-	public static String updateGroupFilelist(String file,String group) {
+	public static String updateGroupFilelist(String group,String file) {
 		String message = "POST UPDATEGROUP?groupname="+group+"&filename="+file+"&ReponseType=JSON";
 		String response = connect(message);
 		return response;

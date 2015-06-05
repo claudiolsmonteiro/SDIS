@@ -72,13 +72,10 @@ public class MainServer extends Thread{
 				out.writeUTF(message);
 				FileOutputStream f_out = new FileOutputStream("database.ser");
 
-				// Write object with ObjectOutputStream
 				ObjectOutputStream obj_out = new ObjectOutputStream (f_out);
 
-				// Write object out to disk
 				obj_out.writeObject (userbase);
 				obj_out.close();
-				
 				server.close();
 
 			}catch(SocketTimeoutException s) {
@@ -96,10 +93,10 @@ public class MainServer extends Thread{
 	//create group XX
 	//join group XX
 	//add permissions XX
-	//delete permissions -- da maneira que esta feito depois um novo admin podia apagar o criador
-	//delete file
-	//backup file
-	//restore file
+	//backup file XX
+	//delete permissions verificar se é o groups.admin(0), so ele é que pode remover
+	//delete file + enviar resultado para o servidor
+	//restore file 
 	@SuppressWarnings("unchecked")
 	public static String getMessage(UserDB userbase, String message ) throws NoSuchAlgorithmException {
 		String response= "";
@@ -133,6 +130,19 @@ public class MainServer extends Thread{
 			        response = obj.toString();
 				}
 			}
+			if(components[0].trim().matches("FILELIST") == true) {
+		        JSONObject obj = new JSONObject();
+		        obj.put("FileList", "Ok");
+		        userbase.printGroup();
+		        Group group = userbase.getGroup(variable1[1].trim());
+		        System.out.println("GROUP NAME WQOLOLOWLW"+group.getFilelist().size());
+				JSONArray filelist = new JSONArray();
+				for(int i = 0; i < group.getFilelist().size(); i++) {
+					filelist.put("Nome: " + group.getFilelist().get(i));
+				}
+		        obj.put("File", filelist);
+		        response = obj.toString();
+			}
 			break;
 
 		case "PUT":
@@ -155,7 +165,7 @@ public class MainServer extends Thread{
 			}
 			else if(components[0].trim().matches("CREATEGROUP") == true) {
 				String[] groupname = arguments[1].split("\\=");
-				int id = UserDB.generateGroupID();
+				int id = userbase.generateGroupID();
 				if(userbase.checkgroupname(groupname[1].trim()) == true) {
 			        JSONObject obj = new JSONObject();
 			        obj.put("CreateGroup", "Failed: Already exists");
@@ -208,7 +218,6 @@ public class MainServer extends Thread{
 			}
 			if(components[0].trim().matches("UPDATEGROUP")==true) {
 				String[] filename = arguments[1].split("\\=");
-
 				if(userbase.checkFileExist(variable1[1].trim(),filename[1].trim()) == false){
 					userbase.updateGroupfilelist(variable1[1].trim(),filename[1].trim());
 			        JSONObject obj = new JSONObject();
@@ -224,6 +233,25 @@ public class MainServer extends Thread{
 			}
 			break;
 		case "DELETE":
+			if(components[0].trim().matches("REVOKE")==true){
+				String[] groupPart = arguments[1].split("\\=");
+				String[] loggeduserPart = arguments[2].split("\\=");
+				String[] revokeduserPart = arguments[3].split("\\=");
+				String groupname = groupPart[1];
+				String loggeduser = loggeduserPart[1];
+				String revokeduser = revokeduserPart[1];
+				
+				if(userbase.revokeAdmin(groupname, loggeduser, revokeduser)){
+				JSONObject obj = new JSONObject();
+				obj.put("REVOKE", "Sucess");
+				response = obj.toString();
+				}
+				else{
+					JSONObject obj = new JSONObject();
+					obj.put("REVOKE", "Failed");
+					response = obj.toString();
+				}
+			}
 			break;
 		}
 			

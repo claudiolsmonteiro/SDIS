@@ -120,7 +120,6 @@ public class Main {
 					response = jsonObj.getString("CreateGroup");
 					if(response.matches("Success")) {
 						loggeduser_groups.add(groupname);
-						System.out.println("Logged in successfully!");
 						group = jsonObj.getJSONArray("Group details");
 						accesstoken =group.getString(0);
 						admintoken = group.getString(1);
@@ -227,6 +226,7 @@ public class Main {
 			System.out.println("2 - Chunk restore");
 			System.out.println("3 - File deletion");
 			System.out.println("4 - Show all files on the group");
+			System.out.println("5 - Revoke admins");
 			System.out.println("9 - Leave");
 			op = sc.nextLine();
 
@@ -239,7 +239,7 @@ public class Main {
 			}
 			else if(op.equals("2")){
 				if(loggeduser.length()!=0)
-					Restore.sendGetChunk();
+					Restore.sendGetChunk(loggeduser_groups.get(groupName));
 				else
 					System.out.println("You need to login 1st");
 			}
@@ -251,6 +251,18 @@ public class Main {
 			}
 			else if(op.equals("4")) {
 				//list all files of a group
+			}
+			else if(op.equals("5")) {
+				if(loggeduser.length() != 0){
+					System.out.println("Admins list:");
+					UserDB.listGroupAdmins(loggeduser_groups.get(groupName));
+					
+					System.out.println("Insert the name of the admin you want to revoke!");
+					String option = sc.nextLine();
+					
+					UserT.revoke(loggeduser_groups.get(groupName), loggeduser, option);
+					
+				}
 			}
 			else if(op.equals("9")){
 				wh = false;

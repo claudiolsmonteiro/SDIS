@@ -9,7 +9,7 @@ import java.util.ArrayList;
 public class UserDB implements Serializable {
 	ArrayList<UserT> users;
 	static ArrayList<Group> groups;
-	
+
 	public UserDB()  {
 		users = new ArrayList<UserT>();
 		groups = new ArrayList<Group>();
@@ -33,6 +33,12 @@ public class UserDB implements Serializable {
 		else
 			users.add(teste);
 	}
+	public Group getGroup(String groupname) {
+		for(int i = 0; i < groups.size();i++)
+			if(groups.get(i).getName().matches(groupname))
+				return groups.get(i);
+		return null;
+	}
 	public boolean passwordcheck(String username , String password) {
 		if(!users.isEmpty()) {
 			for(int i = 0; i < users.size();i++) {
@@ -45,7 +51,7 @@ public class UserDB implements Serializable {
 		}
 		return false;
 	}
-	public static int generateGroupID() {
+	public int generateGroupID() {
 		if(!groups.isEmpty())
 			return groups.size()+1;
 		else
@@ -69,7 +75,7 @@ public class UserDB implements Serializable {
 		for(int i = 0; i < users.size();i++)
 			if(users.get(i).getUsername().matches(username))
 				users.get(i).getGroups().add(newgroup);
-		
+
 	}
 
 	public boolean checkAccesstoken(String trim) {
@@ -95,9 +101,9 @@ public class UserDB implements Serializable {
 				for(int j = 0; j < groups.size();j++)
 					if(groups.get(j).getAccesstoken().matches(accesstoken))
 						users.get(i).getGroups().add(groups.get(j));
-				
+
 		}
-		
+
 	}
 	public void printGroup() {
 		for(int i = 0; i < groups.size();i++)
@@ -114,7 +120,7 @@ public class UserDB implements Serializable {
 						if(!userBelongsToGroup(name,admintoken))
 							users.get(i).getGroups().add(groups.get(j));
 					}
-				
+
 		}
 	}
 	public boolean userBelongsToGroup(String name,String admintoken) {
@@ -145,11 +151,21 @@ public class UserDB implements Serializable {
 		for(int j = 0; j < groups.size();j++)
 			System.out.println(groups.get(j).getName());
 	}
+	
+	public static void listGroupAdmins(String group){
+		for(int i = 0; i < groups.size(); i++){
+			if(groups.get(i).getName().matches(group) == true){
+				for(int j = 0; j < groups.get(i).getAdmins().size(); j++){
+					System.out.println((j+1) + " - " + groups.get(i).getAdmins().get(j));
+				}
+			}
+		}
+	}
 
 	public void updateGroupfilelist(String group, String file) {
 		// TODO Auto-generated method stub
 		for(int i = 0; i < groups.size();i++) {
-			if(groups.get(i).getName().matches("group") == true)
+			if(groups.get(i).getName().matches(group) == true)
 				groups.get(i).fileList.add(file);
 		}
 	}
@@ -157,10 +173,33 @@ public class UserDB implements Serializable {
 	public boolean checkFileExist(String group, String file) {
 		// TODO Auto-generated method stub
 		for(int i = 0; i < groups.size();i++) {
-			if(groups.get(i).getName().matches("group") == true)
+			if(groups.get(i).getName().matches(group) == true)
 				for(int j = 0; j < groups.get(i).getFilelist().size();j++)
 					if(groups.get(i).getFilelist().get(j).matches(file) == true)
 						return true;
+		}
+		return false;
+	}
+
+	public boolean revokeAdmin(String group, String admin, String username){
+		for(int i = 0; i < groups.size(); i++){
+			if(groups.get(i).getName().matches(group) == true){
+				if(groups.get(i).getAdmins().get(0).matches(admin) == true){
+					for(int j = 0; j < groups.get(i).getAdmins().size(); j++){
+						if(groups.get(i).getAdmins().get(j).matches(username)){
+							System.out.println("You just revoked " + groups.get(i).getAdmins().get(j) + " from admin rights!");
+							groups.get(i).getAdmins().remove(j);
+							return true;
+						}	
+					}
+					System.out.println("The admin you selected doesn't exist!");
+					return false;
+				}
+				else{
+					System.out.println("Only the creator of the group can revoke other admins!");
+					return false;
+				}
+			}
 		}
 		return false;
 	}
