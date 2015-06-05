@@ -109,8 +109,12 @@ public class Main {
 					String groupname,response,accesstoken,admintoken;
 					JSONArray group;
 
-					System.out.println("Group Name? ");
+					System.out.println("Group Name? (It cannot have whitespaces)");
 					groupname = sc.nextLine();
+					while(groupname.contains(" ")){
+						System.out.println("The name you entered has whitespaces. Enter another one:");
+						groupname = sc.nextLine();
+					}
 					response = UserT.creategroup(loggeduser, groupname);
 					JSONObject jsonObj = new JSONObject(response);
 					response = jsonObj.getString("CreateGroup");
