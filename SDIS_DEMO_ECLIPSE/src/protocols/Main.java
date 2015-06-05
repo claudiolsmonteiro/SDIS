@@ -22,8 +22,8 @@ public class Main {
 
 	public static HashMap<String, Integer> chunkCache = new HashMap<String, Integer>();
 	public static boolean wh = true;
-	
-	public static void startMenu() throws NoSuchAlgorithmException{
+
+	public static void startMenu() throws NoSuchAlgorithmException, NumberFormatException, IOException, InterruptedException{
 		Scanner sc = new Scanner(System.in);
 		String op;
 		int ret = 0;
@@ -90,7 +90,7 @@ public class Main {
 
 		} while(ret < 5 && wh);
 	}
-	public static void loggedMenu() {
+	public static void loggedMenu() throws NumberFormatException, NoSuchAlgorithmException, IOException, InterruptedException {
 		Scanner sc = new Scanner(System.in);
 		String op;
 		int ret = 0;
@@ -177,7 +177,35 @@ public class Main {
 			}
 			else if(op.equals("3")) {
 				//Listar grupos para entrar e poder sincronizar ficheiros
+				if(loggeduser_groups.size()==0)
+					System.out.println("No groups to show. Join a group 1st");
+				else {
+					System.out.println("Groups:");
+					for(int i = 0; i < loggeduser_groups.size();i++)
+						System.out.println((i+1) + " - " + loggeduser_groups.get(i));
 
+					System.out.print("Select the group you want to enter: ");
+					String opt = sc.nextLine();
+					opt = opt.trim();
+
+					while(true){
+						try{
+							if(Integer.parseInt(opt) < 1 || Integer.parseInt(opt) > loggeduser_groups.size()){
+								System.out.println("Group doesn't exist! Enter one that exists...");
+								opt = sc.nextLine();
+								opt = opt.trim();
+							}
+							else
+								break;
+						}catch(NumberFormatException n){
+							System.out.println("You need to enter the number of the group... Enter again");
+							opt = sc.nextLine();
+							opt = opt.trim();
+						}
+					}
+					
+					groupMenu(Integer.parseInt(opt) - 1);
+				}
 			}
 			else if(op.equals("9")){
 				loggeduser = "";
@@ -187,13 +215,13 @@ public class Main {
 		} while(ret < 5 && wh);		
 	}
 
-	public static void groupMenu() throws NoSuchAlgorithmException, IOException, InterruptedException{
+	public static void groupMenu(int groupName) throws NoSuchAlgorithmException, IOException, InterruptedException{
 		Scanner sc = new Scanner(System.in);
 		String op;
 		int ret = 0;
 
 		do {
-			System.out.println("_________Group Menu_________");
+			System.out.println("_________ Group Menu : " + loggeduser_groups.get(groupName) + " _________");
 			System.out.println("1 - Chunk backup");
 			System.out.println("2 - Chunk restore");
 			System.out.println("3 - File deletion");
