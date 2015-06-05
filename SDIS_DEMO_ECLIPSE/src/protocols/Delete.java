@@ -72,7 +72,7 @@ public class Delete {
 		adressMC = Main.mc.getAddress();
 		System.out.println("Requesting file deletion of: " + filename);
 
-		String newmessage = MessageFormat.createMessageHeader("DELETE", "1.0", fileID, "", "");
+		String newmessage = MessageFormat.createMessageHeader("DELETE", "1.0","" ,fileID, "", "");
 
 		adressMC = Main.mc.getAddress();
 		byte[] responseData =  newmessage.getBytes();

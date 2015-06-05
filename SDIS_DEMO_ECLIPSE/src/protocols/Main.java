@@ -230,8 +230,9 @@ public class Main {
 			op = sc.nextLine();
 
 			if(op.equals("1")){
-				if(loggeduser.length()!=0)
-					ret = Backup.sendChunk(loggeduser_groups);
+				if(loggeduser.length()!=0) {
+					ret = Backup.sendChunk(loggeduser_groups.get(groupName));
+				}
 				else
 					System.out.println("You need to login 1st");
 			}

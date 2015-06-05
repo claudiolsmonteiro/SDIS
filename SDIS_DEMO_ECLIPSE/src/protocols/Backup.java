@@ -28,10 +28,12 @@ public class Backup {
 	//Recebe um PUTCHUNK version filename chunkNo replicDeg <CRLF> <CRLF> Body
 
 	public static int receiveChunk(String[] chunkHeader, byte[] chunkBody) throws IOException{
-
+		
 		String version = chunkHeader[1];
-		String fileID = chunkHeader[2];
-		String chunkNo = chunkHeader[3];
+		String group = chunkHeader [2];
+		String fileID = chunkHeader[3];
+		String chunkNo = chunkHeader[4];
+		System.out.println(version + " " + group + " "+ fileID + " "+ chunkNo+ " ");
 		Random rand = new Random(); 
 		int waitTime = rand.nextInt(401); // 0 a 400 milisegundos	
 
@@ -42,29 +44,29 @@ public class Backup {
 		}
 		if(chunkBody.length == 0){
 			System.out.println("Last message of file, multiple of 64KB.");
-			File lastChunk = new File("backups/" + fileID + "/" + chunkNo + ".chunk");
+			File lastChunk = new File("backups/" + group+ "/"+fileID + "/" + chunkNo + ".chunk");
 			lastChunk.createNewFile();
 		}
 		else{ //Verificar se j� tenho o chunk
-			File filename = new File("backups/" + fileID);
+			File filename = new File("backups/"+group +"/" + fileID);
 			if(filename.exists()){
 				File[] chunks = filename.listFiles();
 				File tmp = new File(chunkNo + ".chunk");
 
-				File checkChunkExist = new File("backups/" + fileID + "/" + chunkNo + ".chunk");
+				File checkChunkExist = new File("backups/"+group +"/" + fileID + "/" + chunkNo + ".chunk");
 				if(checkChunkExist.exists()){
 					System.out.println("Chunk already stored on this peer.");
 					return 2;
 				}
 				else{
-					FileOutputStream saveChunk = new FileOutputStream("backups/" + fileID + "/" + chunkNo + ".chunk");
+					FileOutputStream saveChunk = new FileOutputStream("backups/"+group +"/" + fileID + "/" + chunkNo + ".chunk");
 					saveChunk.write(chunkBody);
 					saveChunk.close();
 				}
 			}
 			else{ //Guardar o chunk
 				filename.mkdir();
-				FileOutputStream saveChunk = new FileOutputStream("backups/" + fileID + "/" + chunkNo + ".chunk");
+				FileOutputStream saveChunk = new FileOutputStream("backups/"+group +"/" + fileID + "/" + chunkNo + ".chunk");
 				saveChunk.write(chunkBody);
 				saveChunk.close();
 			}
@@ -72,7 +74,7 @@ public class Backup {
 
 		//Enviar mensagem para o MC a confirmar
 
-		String response = MessageFormat.createMessageHeader("STORED", version, fileID, chunkNo, "");
+		String response = MessageFormat.createMessageHeader("STORED", version, "",fileID, chunkNo, "");
 
 		if(Main.chunkCache.containsKey(fileID + chunkNo)){
 			int storedTimes = Main.chunkCache.get(fileID + chunkNo);
@@ -99,24 +101,17 @@ public class Backup {
 
 
 	//Fun��o que pede para guardar um ficheiro, divide-o e envia um request PUTCHUNK para o MCB (PUTCHUNK) 
-	public static int sendChunk(ArrayList<String> group_name) throws NoSuchAlgorithmException, IOException, InterruptedException{
+	public static int sendChunk(String groupname) throws NoSuchAlgorithmException, IOException, InterruptedException{
 		/*
 		KeyGenerator keyGen = KeyGenerator.getInstance("AES");
 		keyGen.init(256); // for example
 		SecretKey secretKey = keyGen.generateKey();
 		System.out.println(secretKey);
 		*/
-		String groups;
 		System.out.print("Insert file's path: ");
 		Scanner scanner = new Scanner(System.in);
 		String filepath = scanner.nextLine();
 		
-		
-		for(int i = 0; i < group_name.size();i++) {
-			System.out.println("Group: "+group_name.get(i));
-		}
-		System.out.println("Select the name of the group to which you want to send your file");
-		groups = scanner.nextLine();
 		
 		File fileDir = new File(filepath);
 
@@ -136,7 +131,7 @@ public class Backup {
 			filename = scanner.nextLine();
 			fileName = new File(filepath + "/" + filename);
 		}
-		String key ="OIOIOIOIOIOIOIOI";
+		String key ="1.a4xAf9._a8sl2k";
         File encryptedFile = new File(filepath + "/" + "document.encrypted");
         //File decryptedFile = new File("document.decrypted");
          
@@ -169,7 +164,7 @@ public class Backup {
 
 
 
-		String[] requests = MessageFormat.createMessageArray("PUTCHUNK", "1.0", fileID, Integer.toString(replicDegree), fileSplitted);
+		String[] requests = MessageFormat.createMessageArray("PUTCHUNK", "1.0",groupname, fileID, Integer.toString(replicDegree), fileSplitted);
 		System.out.println("## Going to send " + requests.length + " chunks to the network.\n");
 
 		String backupFile = new String(filename + "/" + requests.length + "/" + fileData.length + ":");

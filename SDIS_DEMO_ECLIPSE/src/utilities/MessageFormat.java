@@ -36,9 +36,9 @@ public class MessageFormat {
 
 	//Create Header Message receiving description of the message (type, version, etc)
 
-	public static String createMessageHeader(String type, String version, String fileID, String chunkNo, String replicDeg){
+	public static String createMessageHeader(String type, String version,String groupname, String fileID, String chunkNo, String replicDeg){
 		String headerMSG = new String();
-		headerMSG = type + " " + version + " " + fileID + " " + chunkNo + " " + replicDeg + CRLF + CRLF;
+		headerMSG = type + " " + version + " "+groupname+ " " + fileID + " " + chunkNo + " " + replicDeg + CRLF + CRLF;
 
 		return headerMSG;
 	}
@@ -85,17 +85,17 @@ public class MessageFormat {
 
 	}
 
-	public static String createMessage(String type, String version, String fileID, String chunkNo, String replicDeg, byte[] fileData){
-		String messageDone = createMessageHeader(type, version, fileID, chunkNo, replicDeg) + (new String (fileData, StandardCharsets.ISO_8859_1));
+	public static String createMessage(String type, String version, String groupname,String fileID, String chunkNo, String replicDeg, byte[] fileData){
+		String messageDone = createMessageHeader(type, version, groupname,fileID, chunkNo, replicDeg) + (new String (fileData, StandardCharsets.ISO_8859_1));
 
 		return messageDone;        
 	}
 
-	public static String[] createMessageArray(String type, String version, String fileID, String replicDeg, byte[][] fileData){
+	public static String[] createMessageArray(String type, String version, String groupname,String fileID, String replicDeg, byte[][] fileData){
 		String[] messagesArray = new String[fileData.length];
 
 		for(int i = 0; i < fileData.length; i++){
-			messagesArray[i] = createMessage(type, version, fileID, Integer.toString(i), replicDeg, fileData[i]);
+			messagesArray[i] = createMessage(type, version, groupname,fileID, Integer.toString(i), replicDeg, fileData[i]);
 		}
 
 		return messagesArray;
@@ -133,6 +133,19 @@ public class MessageFormat {
 			values[3] = messageHeader[3];
 			values[4] = messageHeader[4];
 			
+			if(messageData.length == 1){
+				return "";
+			}
+			fileData = messageData[1];
+			return messageData[1];
+		}
+		else if(messageHeader.length == 6) {
+			values[0] = messageHeader[0];
+			values[1] = messageHeader[1];
+			values[2] = messageHeader[2];
+			values[3] = messageHeader[3];
+			values[4] = messageHeader[4];
+			values[5] = messageHeader[5];
 			if(messageData.length == 1){
 				return "";
 			}
@@ -189,7 +202,7 @@ public class MessageFormat {
 		ficheiroRestaurado.close();	
 		File encryptedFile = new File( "Restored/" + filename);
         File decryptedFile = new File("olas.gif");
-		String key ="OIOIOIOIOIOIOIOI";       
+		String key ="1.a4xAf9._a8sl2k";    
         try {
             CryptoUtils.decrypt(key, encryptedFile, decryptedFile);
             //CryptoUtils.encrypt(key, encryptedFile, decryptedFile);

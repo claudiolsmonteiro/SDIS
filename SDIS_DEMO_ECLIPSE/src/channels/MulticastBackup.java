@@ -70,7 +70,7 @@ public class MulticastBackup extends Thread {
 	}
 
 	public void processData(String data) throws IOException{
-		String[] messageValues = new String[5];
+		String[] messageValues = new String[6];
 		String fileData = new String();
 		String size = MessageFormat.processMessage(data, messageValues, fileData);
 		byte[] bodyData = size.getBytes();

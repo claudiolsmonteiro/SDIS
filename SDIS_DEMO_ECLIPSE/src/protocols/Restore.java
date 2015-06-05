@@ -76,7 +76,7 @@ public class Restore {
 		adressMC = Main.mc.getAddress();
 		System.out.println("Requesting file restore of: " + filename);
 		for(int i = 0; i < Integer.parseInt(noChunks[position]); i++){
-			String message = MessageFormat.createMessageHeader("GETCHUNK", "1.0", fileID, Integer.toString(i), "");
+			String message = MessageFormat.createMessageHeader("GETCHUNK", "1.0", "",fileID, Integer.toString(i), "");
 
 			byte[] responseData =  message.getBytes();
 			packet = new DatagramPacket(responseData, responseData.length, adressMC, Main.mc.getMCPort());
@@ -150,7 +150,7 @@ public class Restore {
 			}
 		}
 
-		String responseMessage = MessageFormat.createMessage("CHUNK", "1.0", fileID, chunkNo, "", fileData);
+		String responseMessage = MessageFormat.createMessage("CHUNK", "1.0", "",fileID, chunkNo, "", fileData);
 
 		try {
 			Thread.sleep(waitTime);
